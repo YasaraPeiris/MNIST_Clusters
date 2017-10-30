@@ -102,7 +102,7 @@ classdef Network_new < handle
 %                 disp(temp);
 %                 end
 
-                weights{r} = weights{r} + temp*0.5;
+                weights{r} = weights{r} + temp*0.47;
 
                 %                 obj.createFeedback(r,temp);
                 
