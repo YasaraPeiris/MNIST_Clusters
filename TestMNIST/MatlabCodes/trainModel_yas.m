@@ -11,15 +11,17 @@ labels = labels(selected);
 images = images(:, selected');
 
 [~, c] = size(images);
+
 dataSize = min(c, dataSize);
 iterations = dataSize;
+
 image_batch = 10;
 
 
 testLabels = [];
 clusters = [];
 
-trainingSize = floor(double(dataSize) * trainingRatio);
+trainingSize = floor(double(dataSize) * trainingRatio)/image_batch;
 unclassified = 0;
 norms = [];
 
@@ -39,35 +41,34 @@ numLayers = net.numLayers;
 tempW = net.feedforwardConnections;
 %tempW = net.lateralConnections;
 temp = net.feedforwardConnections;
-images = [];
+
 pow = 1;
 for r= 1:iterations/image_batch
+    images_new = [];
     for k=1:image_batch
+        
         image_id = 10*(r-1)+k;
-        images = [images; mat2gray(images(:, image_id))];
-    end
-    results = net.getOutput(images);
-    stdp_update(results);
-end
-for r = 1 : iterations
-    
-    results = net.getOutput(mat2gray(images(:, r)));
-    
-    if(r > trainingSize)
-        [m, i] = max(results{numLayers});
-        if(m >= p)
-            testLabels = [testLabels; labels(r)];
-            clusters = [clusters; i];
-        else
-            unclassified = unclassified + 1;
-        end
+
+        images_new = [images_new mat2gray(images(:, image_id))];
         
     end
     
+    results = net.getOutput(images_new);
+    
+     if(r > trainingSize)
+        [m, i] = max(results{numLayers});
+       
+         if(m >= p)
+            testLabels = [testLabels; labels(r)];
+            clusters = [clusters; i];
+         else
+             unclassified = unclassified + 1;
+         end
+        
+     end
+     
     time = tic;
-    
-%     net.STDP_update(results);
-    
+    net.STDP_update(results);
     updateTime = updateTime + toc(time);
     
     
@@ -82,21 +83,13 @@ for r = 1 : iterations
         tempW{k} = weights{k};
 %         disp(norms);
     end
-    
-    %{
-    if r == pow
-        showFinalImage(abs(weights{1} - temp{1}));
-        pow = pow * 10;
-    end
-    %}
-    
 end
 
-plotPerformance([1 : iterations]', norms, testLabels, clusters, [1, 2, 3]);
+plotPerformance([1 : iterations/image_batch]', norms, testLabels, clusters, [1, 2, 3]);
 
-disp(['Unclassified: ', int2str(unclassified), ' out of ', int2str(dataSize - trainingSize)]);
-
-disp(['Average STDP update time = ', num2str(updateTime / iterations)]);
+% disp(['Unclassified: ', int2str(unclassified), ' out of ', int2str(dataSize - trainingSize)]);
+% 
+% disp(['Average STDP update time = ', num2str(updateTime / iterations/image_batch)]);
 
 for r = 1 : numLayers - 1
 

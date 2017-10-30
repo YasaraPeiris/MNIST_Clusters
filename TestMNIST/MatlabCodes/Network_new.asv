@@ -87,9 +87,7 @@ classdef Network_new < handle
                 
                 for k = 1 : n
                     
-%                         total_temp  = layers{r+1}(:,k) * (layers{r}(:,k))'*0.01;
-                    total_temp  = layers{r+1}(:,k) * (layers{r}(:,k))'*0.1;
-                    
+                    total_temp  = layers{r+1}(:,k) * (layers{r}(:,k))';\
                     total_product = total_product + total_temp;
                     
                 end
@@ -101,8 +99,8 @@ classdef Network_new < handle
 %                 if r==3
 %                 disp(temp);
 %                 end
-
-                weights{r} = weights{r} + temp*0.01;
+temp = max(0, );
+                weights{r} = weights{r} + temp;
 
                 %                 obj.createFeedback(r,temp);
                 
