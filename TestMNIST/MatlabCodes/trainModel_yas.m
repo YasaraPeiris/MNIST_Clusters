@@ -1,10 +1,11 @@
 function trainModel(layerset, dataSize) % Using Oja's rule
 
 trainingRatio = 0.7;
-p = 0.25;
+p = 0.3;
 
 images = loadTrainImages();
 labels = loadTrainLabels();
+
 
 selected = find(labels == 2 | labels == 1);
 labels = labels(selected);
@@ -20,7 +21,7 @@ image_batch = 10;
 
 testLabels = [];
 clusters = [];
- 
+  
 trainingSize = floor(double(dataSize) * trainingRatio)/image_batch;
 unclassified = 0;
 norms = [];
