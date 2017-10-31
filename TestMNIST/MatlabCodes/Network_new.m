@@ -98,12 +98,12 @@ classdef Network_new < handle
 
                 total_product = total_product./n;
                 
-                temp = total_product - 0.99*((mean_A')*(mean_B))';
+                temp = total_product - 0.9560*((mean_A')*(mean_B))';
 %                 if r==3
 %                 disp(temp);
 %                 end
 
-                weights{r} = weights{r} + temp*0.5111;
+                weights{r} = weights{r} + temp*0.501;
 
                 %                 obj.createFeedback(r,temp);
                 
