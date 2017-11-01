@@ -16,7 +16,7 @@ classdef Network_new < handle
     properties (SetAccess = public)
         
         layerStruct;
-        numLayers; 
+        numLayers;
         totalRounds;
         ffcheck;
         ltcheck;
@@ -64,8 +64,6 @@ classdef Network_new < handle
             this_a = obj.a;
             temp(temp < 0) = 0;
             temp = temp - 0.005;
-            
-            
             obj.feedforwardConnections{r} = this_a * temp + obj.feedforwardConnections{r};
             
         end
@@ -81,41 +79,51 @@ classdef Network_new < handle
                 mean_B = mean(layers{r+1}');
                 
                 [m,n] = size(layers{r});
-               
+                
                 [e,l] = size((mean_A')*(mean_B));
                 total_product = zeros(l,e);
                 
                 for k = 1 : n
                     
-                        
-                    total_temp  = layers{r+1}(:,k) * (layers{r}(:,k))'*0.099999;
-                    
+                    total_temp  = layers{r+1}(:,k) * (layers{r}(:,k))';
                     total_product = total_product + total_temp;
                     
                 end
                 
-%                 disp(total_product);
-
-                total_product = total_product./n;
-                 
-%                 temp = total_product - 0.95188*((mean_A')*(mean_B))';
-temp = total_product - 0.5*((mean_A')*(mean_B))';
-%                 if r==3
-%                 disp(temp);
-%                 end
-
-%                 weights{r} = weights{r} + temp*0.551;
-weights{r} = weights{r} + temp*0.6;
-
-                %                 obj.createFeedback(r,temp);
+                %                 disp(total_product);
                 
+                total_product = total_product./n;
+                %                 temp = total_product - 0.95188*((mean_A')*(mean_B))';
+                temp = total_product - 0.05*((mean_A')*(mean_B))';
+                %                 if r==3
+                %                 disp(temp);
+                %                 end
+                
+                %                 weights{r} = weights{r} + temp*0.551;
+              
+                if r==3
+                dlmwrite('weight_p.txt','weight','-append');
+                dlmwrite('weight_p.txt',weights{r},'-append');
+                dlmwrite('weight_p.txt','temp/n','-append');
+                dlmwrite('weight_p.txt',temp,'-append');
+                end
+                
+                weights{r} = weights{r} + temp*0.998;
+                if r==3
+%                     dlmwrite('filename.txt','temp');
+%                 dlmwrite('filename.txt',temp);
+               
+                dlmwrite('weight_q.txt',weights{r},'-append');
+                end
+                %                 obj.createFeedback(r,temp);
                 if any(temp < 0)
                     this_check(r) = this_check(r) + 1;
                 end
             end
+            
             obj.feedforwardConnections = weights;
             obj.ffcheck = this_check;
-           
+            
         end
         
         function saveWeights(obj)
@@ -150,15 +158,15 @@ weights{r} = weights{r} + temp*0.6;
         
         function layers = getOutput(obj, input)
             [m,n]=size(input);
-          
+            
             layers = cell([1, obj.numLayers]);
             layers{1} = normc(input);
-
-%             layers{1} = input/norm(input,1.0);
             
-%             layers_batch = zeros(1000, n);
+            %             layers{1} = input/norm(input,1.0);
+            
+            %             layers_batch = zeros(1000, n);
             for k = 1 : obj.numLayers - 1
-               
+                
                 if k == 1
                     layers_batch = obj.feedforwardConnections{k}* (layers{1});
                     
@@ -168,8 +176,8 @@ weights{r} = weights{r} + temp*0.6;
                 end
                 
                 layers{k + 1} = layers_batch;
-                 layers{k + 1} = normc(layers{k + 1});
-%                 layers{k + 1} = layers{k + 1}/norm(layers{k + 1},1.0);
+                layers{k + 1} = normc(layers{k + 1});
+                %                 layers{k + 1} = layers{k + 1}/norm(layers{k + 1},1.0);
             end
             
         end

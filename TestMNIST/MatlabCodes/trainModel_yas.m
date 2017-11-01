@@ -1,7 +1,7 @@
 function trainModel_yas(layerset, dataSize) % Using Oja's rule
 
 trainingRatio = 0.7;
-p = 0.3;
+p = 0;
 
 images = loadTrainImages();
 labels = loadTrainLabels();
@@ -20,7 +20,7 @@ image_batch = 10;
 
 testLabels = [];
 clusters = [];
-  
+
 trainingSize = floor(double(dataSize) * trainingRatio)/image_batch;
 disp(trainingSize);
 unclassified = 0;
@@ -55,20 +55,27 @@ for r= 1:iterations/image_batch
     end
     
     results = net.getOutput(images_new);
+    dlmwrite('filename.txt',results{3});
+    if(r > trainingSize)
+        
+        for p=1:image_batch
+            
+            test_count = test_count+1;
+            [m, i] = max(results{numLayers});
+            
+            if(m >= p)
+                
+                testLabels = [testLabels; labels(r+p)];
+                clusters = [clusters; i];
+                
+            else
+                
+                unclassified = unclassified + 1;
+                
+            end
+        end
+    end
     
-     if(r > trainingSize/image_batch)
-         for p=1:image_batch
-        [m, i] = max(results{numLayers});
-       
-         if(m >= p)
-            testLabels = [testLabels; labels(r+p)];
-            clusters = [clusters; i];
-         else
-             unclassified = unclassified + 1;
-         end
-         end
-     end
-     
     time = tic;
     net.STDP_update(results);
     updateTime = updateTime + toc(time);
@@ -77,30 +84,30 @@ for r= 1:iterations/image_batch
     norms = [norms; zeros(1, numLayers - 1)];
     
     weights = net.feedforwardConnections;
-%     weights = net.lateralConnections;
+    %     weights = net.lateralConnections;
     
     for k = 1 : numLayers - 1
         
         norms(end, k) = norm(weights{k} - tempW{k},'fro') / numel(weights{k});
         tempW{k} = weights{k};
-%         disp(norms);
+        %         disp(norms);
     end
     
 end
 
-    disp('test_count');
-    disp(test_count);
+disp('test_count');
+disp(test_count);
 
 plotPerformance([1 : iterations/image_batch]', norms, testLabels, clusters, [1, 2, 3]);
 
 % disp(['Unclassified: ', int2str(unclassified), ' out of ', int2str(dataSize - trainingSize)]);
-% 
+%
 % disp(['Average STDP update time = ', num2str(updateTime / iterations/image_batch)]);
 
 for r = 1 : numLayers - 1
-
+    
     disp([int2str(r),': ', int2str(net.ffcheck(r))]);
-
+    
 end
 
 %{

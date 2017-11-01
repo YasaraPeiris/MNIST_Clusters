@@ -10,9 +10,6 @@ classdef Network_new < handle
         a = 15.0;
         b = [0.01, 0.01, 0.025];
         %b = [0.0, 0.0, 0.0];
-        m = 0;
-        n = 0;
-        o = 0;
         
     end
     
@@ -67,32 +64,15 @@ classdef Network_new < handle
             this_a = obj.a;
             temp(temp < 0) = 0;
             temp = temp - 0.005;
-            
-            
             obj.feedforwardConnections{r} = this_a * temp + obj.feedforwardConnections{r};
             
         end
         
-        function setParameters(obj,layers)
-            
-            firstparam = linspace(0,1,5);    %list of places to search for first parameter
-            secondparam = linspace(0,1,5);    %list of places to search for second parameter
-            [F,S] = ndgrid(firstparam, secondparam);
-            fitresult = arrayfun(@(p1,p2) obj.fittingfunction(), F, S); %run a fitting on every pair fittingfunction(F(J,K), S(J,K))
-            [minval, minidx] = min(fitresult);
-            bestFirst = F(minidx);
-            bestSecond = S(minidx);
-            obj.n = bestFirst;
-            obj.o = bestSecond;
-            
-        end
-        
-        function fittingfunction(p1,p2)
-            layers = 4;
-            this_m = 0.099999;
-            this_n = p1;
-            this_o = p2;
+        function STDP_update_feedforward(obj, layers)
             weights = obj.feedforwardConnections;
+            this_t = obj.t;
+            this_check = obj.ffcheck;
+            
             parfor r = 1 : obj.numLayers - 1
                 
                 mean_A = mean(layers{r}');
@@ -105,7 +85,7 @@ classdef Network_new < handle
                 
                 for k = 1 : n
                     
-                    total_temp  = layers{r+1}(:,k) * (layers{r}(:,k))'*this_m;
+                    total_temp  = layers{r+1}(:,k) * (layers{r}(:,k))';
                     total_product = total_product + total_temp;
                     
                 end
@@ -113,72 +93,33 @@ classdef Network_new < handle
                 %                 disp(total_product);
                 
                 total_product = total_product./n;
-                
-                temp = total_product - this_n*((mean_A')*(mean_B))';
+                %                 temp = total_product - 0.95188*((mean_A')*(mean_B))';
+                temp = total_product - ((mean_A')*(mean_B))';
                 %                 if r==3
                 %                 disp(temp);
                 %                 end
                 
                 %                 weights{r} = weights{r} + temp*0.551;
-                weights{r} = weights{r} + temp*this_o;
+              
+                if r==3
+                dlmwrite('weight_b.txt',weights{r});
+                dlmwrite('weight_b.txt','temp/n','-append');
+                dlmwrite('weight_b.txt',temp,'-append');
+                end
                 
+                weights{r} = weights{r} + temp*4;
+                if r==3
+%                     dlmwrite('filename.txt','temp');
+%                 dlmwrite('filename.txt',temp);
+                dlmwrite('weight.txt','weights');
+                dlmwrite('weight_a.txt',weights{r},'-append');
+                end
                 %                 obj.createFeedback(r,temp);
-                
                 if any(temp < 0)
                     this_check(r) = this_check(r) + 1;
                 end
             end
             
-        end
-        
-        
-        
-        function STDP_update_feedforward(obj, layers)
-%             weights = obj.feedforwardConnections;
-            obj.setParameters(layers);
-            this_t = obj.t;
-            
-            %             this_n = 0.95188;
-            %             this_o = 0.25999;
-            this_n = obj.n;
-            this_o = obj.o;
-            this_check = obj.ffcheck;
-            
-%             parfor r = 1 : obj.numLayers - 1
-%                 
-%                 mean_A = mean(layers{r}');
-%                 mean_B = mean(layers{r+1}');
-%                 
-%                 [m,n] = size(layers{r});
-%                 
-%                 [e,l] = size((mean_A')*(mean_B));
-%                 total_product = zeros(l,e);
-%                 
-%                 for k = 1 : n
-%                     
-%                     total_temp  = layers{r+1}(:,k) * (layers{r}(:,k))'*this_m;
-%                     total_product = total_product + total_temp;
-%                     
-%                 end
-%                 
-%                 %                 disp(total_product);
-%                 
-%                 total_product = total_product./n;
-%                 
-%                 temp = total_product - this_n*((mean_A')*(mean_B))';
-%                 %                 if r==3
-%                 %                 disp(temp);
-%                 %                 end
-%                 
-%                 %                 weights{r} = weights{r} + temp*0.551;
-%                 weights{r} = weights{r} + temp*this_o;
-%                 
-%                 %                 obj.createFeedback(r,temp);
-%                 
-%                 if any(temp < 0)
-%                     this_check(r) = this_check(r) + 1;
-%                 end
-%             end
             obj.feedforwardConnections = weights;
             obj.ffcheck = this_check;
             
