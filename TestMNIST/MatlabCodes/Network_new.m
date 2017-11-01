@@ -105,7 +105,7 @@ temp = total_product - 0.5*((mean_A')*(mean_B))';
 %                 end
 
 %                 weights{r} = weights{r} + temp*0.551;
-weights{r} = weights{r} + temp*0.2;
+weights{r} = weights{r} + temp*0.6;
 
                 %                 obj.createFeedback(r,temp);
                 
