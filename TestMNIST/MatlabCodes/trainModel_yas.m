@@ -16,6 +16,8 @@ images = images(:, selected');
 dataSize = min(c, dataSize);
 iterations = dataSize;
 
+
+
 image_batch = 10;
 
 
@@ -37,7 +39,7 @@ drawnow;
 %showFinalImage(weights{1});
 %temp = weights;
 
-net = Network_new([784, layerset, 8]);
+net = Network_new([784, layerset, 2]);
 numLayers = net.numLayers;
 tempW = net.feedforwardConnections;
 %tempW = net.lateralConnections;
