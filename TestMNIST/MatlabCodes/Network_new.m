@@ -98,7 +98,8 @@ classdef Network_new < handle
 
                 total_product = total_product./n;
                  
-                temp = total_product - 0.95188*((mean_A')*(mean_B))';
+%                 temp = total_product - 0.95188*((mean_A')*(mean_B))';
+temp = total_product - 0.5*((mean_A')*(mean_B))';
 %                 if r==3
 %                 disp(temp);
 %                 end

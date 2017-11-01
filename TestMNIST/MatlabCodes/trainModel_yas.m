@@ -1,4 +1,4 @@
-function trainModel(layerset, dataSize) % Using Oja's rule
+function trainModel_yas(layerset, dataSize) % Using Oja's rule
 
 trainingRatio = 0.7;
 p = 0.3;
@@ -7,24 +7,22 @@ images = loadTrainImages();
 labels = loadTrainLabels();
 
 
-selected = find(labels == 2 | labels == 1);
-labels = labels(selected);
-images = images(:, selected');
+% selected = find(labels == 2 | labels == 1 | labels == 3);
+% labels = labels(selected);
+% images = images(:, selected');
 
 [~, c] = size(images);
 
 dataSize = min(c, dataSize);
 iterations = dataSize;
 
-
-
 image_batch = 10;
-
 
 testLabels = [];
 clusters = [];
   
 trainingSize = floor(double(dataSize) * trainingRatio)/image_batch;
+disp(trainingSize);
 unclassified = 0;
 norms = [];
 
@@ -44,30 +42,31 @@ numLayers = net.numLayers;
 tempW = net.feedforwardConnections;
 %tempW = net.lateralConnections;
 temp = net.feedforwardConnections;
-
+image_count = 0;
+test_count = 0;
 pow = 1;
 for r= 1:iterations/image_batch
     images_new = [];
     for k=1:image_batch
         
         image_id = 10*(r-1)+k;
-
         images_new = [images_new mat2gray(images(:, image_id))];
         
     end
     
     results = net.getOutput(images_new);
     
-     if(r > trainingSize)
+     if(r > trainingSize/image_batch)
+         for p=1:image_batch
         [m, i] = max(results{numLayers});
        
          if(m >= p)
-            testLabels = [testLabels; labels(r)];
+            testLabels = [testLabels; labels(r+p)];
             clusters = [clusters; i];
          else
              unclassified = unclassified + 1;
          end
-        
+         end
      end
      
     time = tic;
@@ -86,7 +85,11 @@ for r= 1:iterations/image_batch
         tempW{k} = weights{k};
 %         disp(norms);
     end
+    
 end
+
+    disp('test_count');
+    disp(test_count);
 
 plotPerformance([1 : iterations/image_batch]', norms, testLabels, clusters, [1, 2, 3]);
 
