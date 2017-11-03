@@ -1,15 +1,15 @@
 function trainModel_yas(layerset, dataSize) % Using Oja's rule
 
-trainingRatio = 0.7;
+trainingRatio = 0.8;
 p = 0;
 
 images = loadTrainImages();
 labels = loadTrainLabels();
 
 
-% selected = find(labels == 2 | labels == 1 | labels == 3);
-% labels = labels(selected);
-% images = images(:, selected');
+selected = find(labels == 2 | labels == 1 );
+labels = labels(selected);
+images = images(:, selected');
 
 [~, c] = size(images);
 
@@ -49,35 +49,52 @@ for r= 1:iterations/image_batch
     images_new = [];
     for k=1:image_batch
         
-        image_id = 10*(r-1)+k;
+        image_id = image_batch*(r-1)+k;
         images_new = [images_new mat2gray(images(:, image_id))];
         
     end
-    
     results = net.getOutput(images_new);
-    dlmwrite('filename.txt',results{3});
+    if(r < trainingSize)
+        dlmwrite('max_4.txt','train ---------------------------','-append');
+        for u=1:image_batch
+            test_count = test_count+1;
+            [m, i] = max(results{numLayers}(:,u));
+            dlmwrite('max_4.txt','max','-append');
+            dlmwrite('max_4.txt',results{numLayers}(:,u),'-append');
+             dlmwrite('max_4.txt','i','-append');
+            dlmwrite('max_4.txt',i,'-append');
+            dlmwrite('max_4.txt','label','-append');
+            dlmwrite('max_4.txt',labels(image_id),'-append');
+        end
+    end
+    
     if(r > trainingSize)
-        
-        for p=1:image_batch
+        dlmwrite('max_4.txt','test ---------------------------','-append');
+         for u=1:image_batch
             
             test_count = test_count+1;
-            [m, i] = max(results{numLayers});
-            
+            [m, i] = max(results{numLayers}(:,u));
+            dlmwrite('max_4.txt','max','-append');
+            dlmwrite('max_4.txt',results{numLayers}(:,u),'-append');
+             dlmwrite('max_4.txt','i','-append');
+            dlmwrite('max_4.txt',i,'-append');
             if(m >= p)
-                
-                testLabels = [testLabels; labels(r+p)];
+                  image_id = image_batch*(r-1)+u;
+                  testLabels = [testLabels; labels(image_id)];
+%                  testLabels = [testLabels; labels(r)];
                 clusters = [clusters; i];
+               
                 
             else
                 
                 unclassified = unclassified + 1;
                 
             end
-        end
+          end
     end
     
     time = tic;
-    net.STDP_update(results);
+    net.STDP_update(results,r);
     updateTime = updateTime + toc(time);
     
     

@@ -68,7 +68,7 @@ classdef Network_new < handle
             
         end
         
-        function STDP_update_feedforward(obj, layers)
+        function STDP_update_feedforward(obj, layers, iteration)
             weights = obj.feedforwardConnections;
             this_t = obj.t;
             this_check = obj.ffcheck;
@@ -85,7 +85,7 @@ classdef Network_new < handle
                 
                 for k = 1 : n
                     
-                    total_temp  = layers{r+1}(:,k) * (layers{r}(:,k))';
+                    total_temp  = layers{r+1}(:,k) * (layers{r}(:,k))'*0.0999;
                     total_product = total_product + total_temp;
                     
                 end
@@ -93,28 +93,41 @@ classdef Network_new < handle
                 %                 disp(total_product);
                 
                 total_product = total_product./n;
-                %                 temp = total_product - 0.95188*((mean_A')*(mean_B))';
-                temp = total_product - 0.05*((mean_A')*(mean_B))';
+                                temp = total_product - 0.95188*((mean_A')*(mean_B))';
+%                 temp = total_product - 0.8378*((mean_A')*(mean_B))';
                 %                 if r==3
                 %                 disp(temp);
                 %                 end
                 
                 %                 weights{r} = weights{r} + temp*0.551;
               
-                if r==3
-                dlmwrite('weight_p.txt','weight','-append');
-                dlmwrite('weight_p.txt',weights{r},'-append');
-                dlmwrite('weight_p.txt','temp/n','-append');
-                dlmwrite('weight_p.txt',temp,'-append');
-                end
+%                 if r==3
+%                 dlmwrite('weight_p.txt','weight','-append');
+%                 dlmwrite('weight_p.txt',weights{r},'-append');
+%                 dlmwrite('weight_p.txt','temp/n','-append');
+%                 dlmwrite('weight_p.txt',temp,'-append');
+%                 end
+% if r==3
+%     disp('weight_b');
+%     weights{r}
+%     disp('temp');
+%     disp(temp);
+% end
                 
-                weights{r} = weights{r} + temp*0.998;
-                if r==3
-%                     dlmwrite('filename.txt','temp');
-%                 dlmwrite('filename.txt',temp);
-               
-                dlmwrite('weight_q.txt',weights{r},'-append');
-                end
+                weights{r} = weights{r} + temp*(exp(-0.001*iteration));
+%                 if r==3
+%                     disp('exp');
+%                     exp(-0.2*iterati  on)
+%                     temp*(exp(-0.2*iteration))
+%                     disp('weight_a');
+%                     weights{r}
+%                  end
+%                 if r==3
+% %                     dlmwrite('filename.txt','temp');
+% %                 dlmwrite('filename.txt',temp);
+%                
+%                 dlmwrite('weight_q.txt',weights{r},'-append');
+%                 end
                 %                 obj.createFeedback(r,temp);
                 if any(temp < 0)
                     this_check(r) = this_check(r) + 1;
@@ -160,9 +173,9 @@ classdef Network_new < handle
             [m,n]=size(input);
             
             layers = cell([1, obj.numLayers]);
-            layers{1} = normc(input);
+%             layers{1} = normc(input);
             
-            %             layers{1} = input/norm(input,1.0);
+                         layers{1} = input/norm(input,1.0);
             
             %             layers_batch = zeros(1000, n);
             for k = 1 : obj.numLayers - 1
@@ -176,16 +189,17 @@ classdef Network_new < handle
                 end
                 
                 layers{k + 1} = layers_batch;
-                layers{k + 1} = normc(layers{k + 1});
-                %                 layers{k + 1} = layers{k + 1}/norm(layers{k + 1},1.0);
+%                 layers{k + 1} = normc(layers{k + 1});
+                layers{k + 1} = layers{k + 1}/norm(layers{k + 1},1.0);
             end
+           
             
         end
         
-        function STDP_update(obj, layers)
+        function STDP_update(obj, layers, r)
             
             obj.totalRounds = obj.totalRounds + 1;
-            obj.STDP_update_feedforward(layers);
+            obj.STDP_update_feedforward(layers, r);
             %          obj.STDP_update_lateral(layers);
             
         end

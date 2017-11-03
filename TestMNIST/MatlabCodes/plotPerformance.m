@@ -21,15 +21,16 @@ if ~isempty(testLabels)
         numClust = numel(uniqueClust);
         numLabels = numel(uniqueLbl);
 
-        clusInd = arrayfun(@(x) find(uniqueClust == x, 1), clusters);
-        lblInd = arrayfun(@(x) find(uniqueLbl == x, 1), testLabels);
-        
+        clusInd = arrayfun(@(x) find(uniqueClust == x, 3), clusters);
+        lblInd = arrayfun(@(x) find(uniqueLbl == x, 3), testLabels);
+
         y = zeros(numClust, numLabels);
         [r, ~] = size(clusters);
         
-        
+       
         for i = 1 : r
             y(clusInd(i), lblInd(i)) = y(clusInd(i), lblInd(i)) + 1;
+            
         end
     
         %y = bsxfun(@rdivide, 100 * y ,sum(y, 2));
