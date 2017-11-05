@@ -1,3 +1,4 @@
+
 function trainModel_yas(layerset, dataSize) % Using Oja's rule
 
 trainingRatio = 0.8;
@@ -16,7 +17,7 @@ images = images(:, selected');
 dataSize = min(c, dataSize);
 iterations = dataSize;
 
-image_batch = 10;
+image_batch = 1;
 
 testLabels = [];
 clusters = [];
@@ -45,39 +46,53 @@ temp = net.feedforwardConnections;
 image_count = 0;
 test_count = 0;
 pow = 1;
+count_labels_1=0;
+count_labels_2=0;
 for r= 1:iterations/image_batch
     images_new = [];
     for k=1:image_batch
         
         image_id = image_batch*(r-1)+k;
         images_new = [images_new mat2gray(images(:, image_id))];
+     
         
     end
-    results = net.getOutput(images_new);
+    size(images_new)
+    results = net.getOutput(images_new,r);
     if(r < trainingSize)
-        dlmwrite('max_4.txt','train ---------------------------','-append');
+%         dlmwrite('max_4.txt','train ---------------------------','-append');
         for u=1:image_batch
-            test_count = test_count+1;
-            [m, i] = max(results{numLayers}(:,u));
-            dlmwrite('max_4.txt','max','-append');
-            dlmwrite('max_4.txt',results{numLayers}(:,u),'-append');
-             dlmwrite('max_4.txt','i','-append');
-            dlmwrite('max_4.txt',i,'-append');
-            dlmwrite('max_4.txt','label','-append');
-            dlmwrite('max_4.txt',labels(image_id),'-append');
+            image_id = image_batch*(r-1)+u;
+            [m, ~] = max(results{numLayers}(:,u));
+              if(labels(image_id) == 1 && count_labels_1<2)
+            count_labels_1=count_labels_1 + 1;
+            xlswrite('weight_11.xlsx',results{1}(:,u),'A1');
+            xlswrite('weight_11.xlsx',results{4}(:,u),'E1');
+        end 
+        if (labels(image_id) == 2 && count_labels_2<2)
+            count_labels_2=count_labels_2 + 1;
+            xlswrite('weight_11.xlsx',results{1}(:,u),'C1');
+            xlswrite('weight_11.xlsx',results{4}(:,u),'G1');
+        end
+%             dlmwrite('max_4.txt','max','-append');
+%             dlmwrite('max_4.txt',results{numLayers}(:,u),'-append');
+%              dlmwrite('max_4.txt','i','-append');
+%             dlmwrite('max_4.txt',i,'-append');
+%             dlmwrite('max_4.txt','label','-append');
+%             dlmwrite('max_4.txt',labels(image_id),'-append');
         end
     end
     
     if(r > trainingSize)
-        dlmwrite('max_4.txt','test ---------------------------','-append');
+%         dlmwrite('max_4.txt','test ---------------------------','-append');
          for u=1:image_batch
             
             test_count = test_count+1;
             [m, i] = max(results{numLayers}(:,u));
-            dlmwrite('max_4.txt','max','-append');
-            dlmwrite('max_4.txt',results{numLayers}(:,u),'-append');
-             dlmwrite('max_4.txt','i','-append');
-            dlmwrite('max_4.txt',i,'-append');
+%             dlmwrite('max_4.txt','max','-append');
+%             dlmwrite('max_4.txt',results{numLayers}(:,u),'-append');
+%              dlmwrite('max_4.txt','i','-append');
+%             dlmwrite('max_4.txt',i,'-append');
             if(m >= p)
                   image_id = image_batch*(r-1)+u;
                   testLabels = [testLabels; labels(image_id)];
@@ -86,7 +101,7 @@ for r= 1:iterations/image_batch
                
                 
             else
-                
+%                 disp(unclassified);
                 unclassified = unclassified + 1;
                 
             end
@@ -96,7 +111,7 @@ for r= 1:iterations/image_batch
     time = tic;
     net.STDP_update(results,r);
     updateTime = updateTime + toc(time);
-    
+    for u = 1 : image_batch
     
     norms = [norms; zeros(1, numLayers - 1)];
     
@@ -105,17 +120,18 @@ for r= 1:iterations/image_batch
     
     for k = 1 : numLayers - 1
         
-        norms(end, k) = norm(weights{k} - tempW{k},'fro') / numel(weights{k});
-        tempW{k} = weights{k};
+        norms(end, k) = norm(weights{k}(:,u) - tempW{k}(:,u),'fro') / numel(weights{k}(:,u));
+        tempW{k}(:,u) = weights{k}(:,u);
         %         disp(norms);
     end
     
+    end
 end
 
 disp('test_count');
 disp(test_count);
 
-plotPerformance([1 : iterations/image_batch]', norms, testLabels, clusters, [1, 2, 3]);
+plotPerformance([1 : iterations]', norms, testLabels, clusters, [1, 2, 3]);
 
 % disp(['Unclassified: ', int2str(unclassified), ' out of ', int2str(dataSize - trainingSize)]);
 %
@@ -124,6 +140,9 @@ plotPerformance([1 : iterations/image_batch]', norms, testLabels, clusters, [1, 
 for r = 1 : numLayers - 1
     
     disp([int2str(r),': ', int2str(net.ffcheck(r))]);
+    sheet=1;
+%     xlswrite('weight_2.xlsx','new layer',sheet);
+%     xlswrite('weight_2.xlsx',weights{r},sheet);
     
 end
 
