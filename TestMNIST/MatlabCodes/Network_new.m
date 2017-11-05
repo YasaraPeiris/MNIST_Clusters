@@ -86,7 +86,7 @@ classdef Network_new < handle
 %                 total_product = [];
                 for k = 1 : n
                     
-                    total_temp  = layers{r+1}(:,k) * (layers{r}(:,k))'*0.0999;
+                    total_temp  = layers{r+1}(:,k) * (layers{r}(:,k))'*0.999;
                     total_product = total_product + total_temp;
                     
                 end
@@ -102,11 +102,11 @@ classdef Network_new < handle
 %                     xlswrite('total_product_iteration_1_r1_after_div.xlsx',total_product);
 %                     end
 %                 temp = total_product+0.5*exp(-5*nthroot(iteration,13)) - 0.1*((mean_A')*(mean_B))';
-              temp = total_product - 0.09*((mean_A')*(mean_B))';
+              temp = total_product - 0.766*((mean_A')*(mean_B))';
               
-               
+           
                 
-                    temp = temp*(exp(-0.004*iteration));
+                    temp = temp*(exp(-0.006*iteration));
 %                 end
 %                 if(iteration == 1 && r==1)
 %                     xlswrite('temp_1.xlsx',temp);
@@ -241,12 +241,14 @@ classdef Network_new < handle
             
             layers = cell([1, obj.numLayers]);  
             
-            layers{1} = normc(input);
-            layers{1} = layers{1} + 0.0005;
-%              layers{1} = 1./(1+exp(-input));
+%             layers{1} = normc(input);
+%  layers{1} = 1./(1+exp(-input));
+            
+             
             sheet =1;
             
-%             layers{1} = input/norm(input,1.0);
+             layers{1} = input/norm(input,1.0);
+             layers{1} = layers{1};
 %              dlmwrite('analyze_layer_1.txt',iteration,'-append');
 %              dlmwrite('analyze_layer_1.txt',layers{1},'-append');
             %             layers_batch = zeros(1000, n);
@@ -259,16 +261,18 @@ classdef Network_new < handle
                   layers{k + 1} = obj.feedforwardConnections{k}* layers{k};
                     
 %                 end
-                  layers{k + 1} = normc(layers{k + 1});
+%                   layers{k + 1} = normc(layers{k + 1});
               
-%                 layers{k + 1} = layers{k + 1}/norm(layers{k + 1},1.0);
-% layers{k + 1} = 1./(1+exp(-layes{k + 1}));
+                 layers{k + 1} = layers{k + 1}/norm(layers{k + 1},1.0);
+%  layers{k + 1} = 1./(1+exp(-layers{k + 1}));
             end
               if(iteration>this_totalRounds)
-                     xlswrite('final_1.xlsx',layers{1});
-                     xlswrite('final_2.xlsx',layers{2});
-                     xlswrite('final_3.xlsx',layers{3});
-                      xlswrite('final_4.xlsx',layers{4});
+                  
+%                      xlswrite('final_1_4.xlsx',layers{1});
+%                      xlswrite('final_2_4.xlsx',layers{2});
+%                      xlswrite('final_3_4.xlsx',layers{3});
+%                       xlswrite('final_4_4.xlsx',layers{4});
+%                     
 %                       xlswrite('finalfeed_1.xlsx',obj.feedforwardConnections{1});
 %                      xlswrite('finalfeed_2.xlsx',obj.feedforwardConnections{2});
 %                      xlswrite('finalfeed_3.xlsx',obj.feedforwardConnections{3});

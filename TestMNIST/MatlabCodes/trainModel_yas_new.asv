@@ -29,14 +29,17 @@ image_batch = 10;
 newDataSize = min(c_1,c_2);
 newDataSize = min(newDataSize,dataSize);
 newIterations = fix(newDataSize/image_batch);
-
+testImageStartId = newIterations*image_batch;
 test_image = [];
 test_label = [];
-for i =1:image_batch
-    test_image  = [test_image mat2gray(images(:, newDataSize-i-1))];
-    test_label = [test_label labels(c-i-1)];
+size(images(:,testImageStartId ))
+for i =1:image_batch*100
+    test_image  = [test_image mat2gray(images(:,testImageStartId+i ))];
+    test_label = [test_label labels(testImageStartId+i)];
+    test_label
 end
-test_label
+xlswrite('test.xlsx',test_image);
+xlswrite('label.xlsx',test_label);
 
 testLabels = [];
 clusters = [];
@@ -112,8 +115,16 @@ for r= 1:newIterations
     
     
 end
-
-results = net.getOutput(test_image,newIterations+u,-1);
+for 1: size(test_image)
+test_image_batch=[];
+ for k=1:image_batch
+  image_id = image_batch*(r-1)+k;
+  images_new_1 = [images_new_1 mat2gray(images_train_1(:, image_id))];
+            
+     
+ end
+end
+results = net.getOutput(test_image,newIterations+1,-1);
 
 for u=1:image_batch
     

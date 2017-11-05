@@ -6,9 +6,9 @@ p = 0;
 images = loadTrainImages();
 labels = loadTrainLabels();
 
-selected = find(labels == 2 | labels == 1 );
-labels = labels(selected);
-images = images(:, selected');
+% selected = find(labels == 2 | labels == 1 );
+% labels = labels(selected);
+% images = images(:, selected');
 [~, c] = size(images);
 % images(c) = [];
 
@@ -125,7 +125,7 @@ for u=1:image_batch
 %     xlswrite('weight_16.xlsx',results{4});
     
     [m, i] = max(results{numLayers}(:,u));
-    m
+   
     if(m >= p)
         %                 image_id = image_batch*(r-1)+u;
         testLabels = [testLabels; test_label(:,u)];
@@ -139,7 +139,7 @@ for u=1:image_batch
     end
 end
 
-
+unclassified
 
 plotPerformance([1 : newIterations*image_batch]', norms, testLabels, clusters, [1, 2, 3]);
 
