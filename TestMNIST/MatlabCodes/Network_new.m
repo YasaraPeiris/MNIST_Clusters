@@ -41,10 +41,10 @@ classdef Network_new < handle
         
         function createFeedforward(obj)
             
-            if exist(obj.weightFile, 'file') == 2
-                load(obj.weightFile, 'feedforwardConnections');
-                obj.feedforwardConnections = feedforwardConnections;
-            else
+%             if exist(obj.weightFile, 'file') == 2
+%                 load(obj.weightFile, 'feedforwardConnections');
+%                 obj.feedforwardConnections = feedforwardConnections;
+%             else
                 
                 obj.feedforwardConnections = cell([1, obj.numLayers - 1]);
                 
@@ -59,7 +59,7 @@ classdef Network_new < handle
 %                        obj.feedforwardConnections{i} =   ones([obj.layerStruct(i+1),obj.layerStruct(i)]);
                 end
                 
-             end
+%              end
             
             obj.ffcheck = zeros(1, obj.numLayers - 1);
             
@@ -86,7 +86,7 @@ classdef Network_new < handle
 %                 total_product = [];
                 for k = 1 : n
                     
-                    total_temp  = layers{r+1}(:,k) * (layers{r}(:,k))'*0.0999;
+                    total_temp  = layers{r+1}(:,k) * (layers{r}(:,k))'*0.000099;
                     total_product = total_product + total_temp;
                     
                 end
@@ -98,32 +98,33 @@ classdef Network_new < handle
 %                     xlswrite('total_product_iteration_1_r1_after.xlsx',total_product);
 %                     end
                 total_product = total_product./n;
+                
 %                 if r==1 & iteration==1
 %                     xlswrite('total_product_iteration_1_r1_after_div.xlsx',total_product);
 %                     end
-%                 temp = total_product+0.5*exp(-5*nthroot(iteration,13)) - 0.1*((mean_A')*(mean_B))';
-              temp = total_product - 0.67*((mean_A')*(mean_B))';
+                   temp = total_product - 0.00095*((mean_A')*(mean_B))';
+%                temp = total_product - 0.75*((mean_A')*(mean_B))';
 %               if r==1 || r==2
-%                   temp = temp*100;
+                 
 %               end
          
-           
+         
                 
-                    temp = temp*(exp(-0.008*iteration));
-                    temp =temp/exp(r);
+                     temp = (temp*(exp(-0.008*iteration))/r);
+                   
 %                 end
-%                 if(iteration == 1 && r==1)
-%                     xlswrite('temp_1.xlsx',temp);
-%                     xlswrite('weight_1',weights{r}(:,1:50));
-%                 end
-%                  if(iteration == 1 && r==2)
-%                     xlswrite('temp_2.xlsx',temp);
-%                     xlswrite('weight_2.xlsx',weights{r}(:,1:50));
-%                  end
-%                  if(iteration == 1 && r==3)
-%                     xlswrite('temp_3.xlsx',temp);
-%                     xlswrite('weight_3.xlsx',weights{r});
-%                  end
+                if(iteration == this_totalRounds && r==1)
+                    xlswrite('temp_1.xlsx',temp);
+                    xlswrite('weight_1',weights{r}(:,1:50));
+                end
+                 if(iteration == this_totalRounds && r==2)
+                    xlswrite('temp_2.xlsx',temp);
+                    xlswrite('weight_2.xlsx',weights{r}(:,1:50));
+                 end
+                 if(iteration == this_totalRounds && r==3)
+                    xlswrite('temp_3.xlsx',temp);
+                    xlswrite('weight_3.xlsx',weights{r});
+                 end
 
                 weights{r} = weights{r} + temp;
 %                  if(iteration == 1 && r==1)
@@ -141,7 +142,7 @@ classdef Network_new < handle
                  
 %                  if(iteration == this_totalRounds && r==1)
 %                   
-%                     xlswrite('weight_1_e',weights{r});
+%                     xlswrite('weight_1_e.xlsx',weights{r});
 %                 end
 %                  if(iteration == this_totalRounds && r==2)
 %                   
@@ -206,6 +207,9 @@ classdef Network_new < handle
         
         function layers = getOutput(obj, input,iteration,label)
             this_totalRounds = obj.iterationImages;
+                    
+%                     xlswrite('total_product_r+1.xlsx',layers{r+1});
+%                     end
 %             xcel_name_1 = 'weight_1_lyr_1_1_no_1.xlsx';
 %             xcel_name_2 = 'weight_1_lyr_4_1_no_1.xlsx';
 %             xcel_name_3 = 'weight_1_lyr_1_e_no_1.xlsx';
@@ -244,48 +248,41 @@ classdef Network_new < handle
             [m,n]=size(input);
             
             layers = cell([1, obj.numLayers]);  
-%             input(input<0) = 0;
-%             input(input>0) = 1;
-%             
+              input(input<0) = 0;
+              input(input>0) = 1;
+% %             
+%             layers{1} = input;
             layers{1} = input;
-%             layers{1} = normc(input);
-    layers{1} = 1./(1+exp(-input))+0.005;
-           
+%              layers{1} = normc(input);
+%       layers{1} = 1./(1+exp(-input));
+          
             sheet =1;
             
-%               layers{1} = input/norm((input),1);
+%                layers{1} = input/norm((input),1.0);
+                
 %              layers{1} = layers{1};
 %              dlmwrite('analyze_layer_1.txt',iteration,'-append');
 %              dlmwrite('analyze_layer_1.txt',layers{1},'-append');
             %             layers_batch = zeros(1000, n);
             for k = 1 : obj.numLayers - 1
                 
-%                 if k == 1
-%                     layers_batch = obj.feedforwardConnections{k}* (layers{1});
-%                     
-%                 else
+%             
                   layers{k + 1} = obj.feedforwardConnections{k}* layers{k};
-                    
-%                 end
-%                   layers{k + 1} = normc(layers{k + 1});
-              
+%                  
 %                   layers{k + 1} = layers{k + 1}/norm(layers{k + 1},1.0);
-      if k== 1  
-                   layers{k + 1} = (exp(layers{k + 1})-exp(-layers{k + 1}))./(exp(layers{k + 1})+exp(-layers{k + 1}));
- 
-           
-      else
-           layers{k + 1} = 1./(1+exp(-layers{k + 1}));
-      end
+      
+%             layers{k + 1} = 1./(1+exp(-layers{k + 1}));
+ layers{k + 1} = layers{k + 1}/norm(layers{k + 1},1.0);
+    
             end
             
               if(iteration>this_totalRounds)
-                  disp('d');
-                      xlswrite('final_1_5.xlsx',layers{1});
-                      xlswrite('final_2_5.xlsx',layers{2});
+%                   disp('d');
+%                       xlswrite('final_1_5.xlsx',layers{1});
+%                       xlswrite('final_2_5.xlsx',layers{2});
                       xlswrite('final_3_5.xlsx',layers{3});
-                       xlswrite('final_4_5.xlsx',layers{4});
-                     
+                        xlswrite('final_4_5.xlsx',layers{4});
+%                      
 %                       xlswrite('finalfeed_1.xlsx',obj.feedforwardConnections{1});
 %                      xlswrite('finalfeed_2.xlsx',obj.feedforwardConnections{2});
 %                      xlswrite('finalfeed_3.xlsx',obj.feedforwardConnections{3});
