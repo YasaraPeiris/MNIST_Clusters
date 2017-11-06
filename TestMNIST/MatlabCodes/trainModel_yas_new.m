@@ -6,9 +6,9 @@ p = 0;
 images = loadTrainImages();
 labels = loadTrainLabels();
 
-% selected = find(labels == 2 | labels == 1 );
-% labels = labels(selected);
-% images = images(:, selected');
+selected = find(labels == 2 | labels == 1 );
+labels = labels(selected);
+images = images(:, selected');
 [~, c] = size(images);
 % images(c) = [];
 
@@ -32,14 +32,14 @@ newIterations = fix(newDataSize/image_batch);
 testImageStartId = newIterations*image_batch;
 test_image = [];
 test_label = [];
-size(images(:,testImageStartId ))
+
 for i =1:image_batch
     test_image  = [test_image mat2gray(images(:,testImageStartId+i ))];
     test_label = [test_label labels(testImageStartId+i)];
-    
+    test_label
 end
-xlswrite('test.xlsx',test_image);
-xlswrite('label.xlsx',test_label);
+% xlswrite('test.xlsx',test_image);
+% xlswrite('label.xlsx',test_label);
 
 testLabels = [];
 clusters = [];
@@ -79,15 +79,16 @@ for r= 1:newIterations/2
     images_new = [];
     
     
-        for k=1:image_batch
-            image_id = image_batch*(r-1)+k;
-            images_new_1 = [images_new_1 mat2gray(images_train_1(:, image_id))];
-            images_new_2 = [images_new_2 mat2gray(images_train_2(:, image_id))];
-        end
-        images_new = [images_new images_new_1];
-        images_new = [images_new images_new_2];
-        
+    for k=1:image_batch
+        image_id = image_batch*(r-1)+k;
+        images_new_1 = [images_new_1 mat2gray(images_train_1(:, image_id))];
+        images_new_2 = [images_new_2 mat2gray(images_train_2(:, image_id))];
+    end
+    images_new = [images_new images_new_1];
+    images_new = [images_new images_new_2];
+    
 end
+
 for r= 1:newIterations
     results = net.getOutput(images_new,r);
     %
@@ -116,30 +117,46 @@ for r= 1:newIterations
     
 end
 
-results = net.getOutput(test_image,newIterations+1,-1);
+[~,margin] = size(test_image);
 
-for u=1:image_batch
-    
-%     columns = ['A1','B1','C1','D1','E1','F1','G1','H1','I1','J1'];
-%     xlswrite('weight_15.xlsx',results{1});
-%     xlswrite('weight_16.xlsx',results{4});
-    
-    [m, i] = max(results{numLayers}(:,u));
-   
-    if(m >= p)
-        %                 image_id = image_batch*(r-1)+u;
-        testLabels = [testLabels; test_label(:,u)];
-        %               testLabels = [testLabels; labels(r)];
-        clusters = [clusters; i];
-        disp(i)
-    else
-        %                 disp(unclassified);
-        unclassified = unclassified + 1;
+for h = 1: margin/image_batch
+    disp(h);
+    test_image_batch=[];
+    for k=1:image_batch
         
+        image_id = image_batch*(h-1)+k;
+
+        test_image_batch = [test_image_batch test_image(:,image_id)];
+        
+        
+    end
+    
+    
+    results = net.getOutput(test_image_batch,newIterations+1,-1);
+   
+    for u=1:image_batch
+        
+        %     columns = ['A1','B1','C1','D1','E1','F1','G1','H1','I1','J1'];
+        %     xlswrite('weight_15.xlsx',results{1});
+        %     xlswrite('weight_16.xlsx',results{4});
+        
+        [m, i] = max(results{numLayers}(:,u));
+        m
+        if(m >= p)
+            %                 image_id = image_batch*(r-1)+u;
+            testLabels = [testLabels; test_label(:,u)];
+            %               testLabels = [testLabels; labels(r)];
+            clusters = [clusters; i];
+            disp(i)
+        else
+            %                 disp(unclassified);
+            unclassified = unclassified + 1;
+            
+        end
     end
 end
 
-unclassified
+
 
 plotPerformance([1 : newIterations*image_batch]', norms, testLabels, clusters, [1, 2, 3]);
 

@@ -23,12 +23,20 @@ testLabels = [];
 clusters = [];
 
 trainingSize = floor(double(dataSize) * trainingRatio)/image_batch;
-disp(trainingSize);
+
 unclassified = 0;
 norms = [];
 
 updateTime = 0.0;
+testImageStartId = iterations;
+test_image = [];
+test_label = [];
 
+for i =1:image_batch
+    test_image  = [test_image mat2gray(images(:,testImageStartId+i ))];
+    test_label = [test_label labels(testImageStartId+i)];
+    
+end
 %{
 im = vec2mat(images(:, randi(10000)), 28)';
 imshow(im);
@@ -57,23 +65,14 @@ for r= 1:iterations/image_batch
      
         
     end
-    size(images_new)
+    
     results = net.getOutput(images_new,r);
     if(r < trainingSize)
 %         dlmwrite('max_4.txt','train ---------------------------','-append');
         for u=1:image_batch
             image_id = image_batch*(r-1)+u;
             [m, ~] = max(results{numLayers}(:,u));
-              if(labels(image_id) == 1 && count_labels_1<2)
-            count_labels_1=count_labels_1 + 1;
-            xlswrite('weight_11.xlsx',results{1}(:,u),'A1');
-            xlswrite('weight_11.xlsx',results{4}(:,u),'E1');
-        end 
-        if (labels(image_id) == 2 && count_labels_2<2)
-            count_labels_2=count_labels_2 + 1;
-            xlswrite('weight_11.xlsx',results{1}(:,u),'C1');
-            xlswrite('weight_11.xlsx',results{4}(:,u),'G1');
-        end
+             
 %             dlmwrite('max_4.txt','max','-append');
 %             dlmwrite('max_4.txt',results{numLayers}(:,u),'-append');
 %              dlmwrite('max_4.txt','i','-append');
@@ -81,31 +80,6 @@ for r= 1:iterations/image_batch
 %             dlmwrite('max_4.txt','label','-append');
 %             dlmwrite('max_4.txt',labels(image_id),'-append');
         end
-    end
-    
-    if(r > trainingSize)
-%         dlmwrite('max_4.txt','test ---------------------------','-append');
-         for u=1:image_batch
-            
-            test_count = test_count+1;
-            [m, i] = max(results{numLayers}(:,u));
-%             dlmwrite('max_4.txt','max','-append');
-%             dlmwrite('max_4.txt',results{numLayers}(:,u),'-append');
-%              dlmwrite('max_4.txt','i','-append');
-%             dlmwrite('max_4.txt',i,'-append');
-            if(m >= p)
-                  image_id = image_batch*(r-1)+u;
-                  testLabels = [testLabels; labels(image_id)];
-%                  testLabels = [testLabels; labels(r)];
-                clusters = [clusters; i];
-               
-                
-            else
-%                 disp(unclassified);
-                unclassified = unclassified + 1;
-                
-            end
-          end
     end
     
     time = tic;
@@ -128,8 +102,40 @@ for r= 1:iterations/image_batch
     end
 end
 
-disp('test_count');
-disp(test_count);
+for h = 1: margin/image_batch
+    test_image_batch=[];
+    for k=1:image_batch
+        
+        image_id = image_batch*(h-1)+k;
+
+        test_image_batch = [test_image_batch test_image(:,image_id)];
+        
+        
+    end
+    
+    
+    results = net.getOutput(test_image_batch,newIterations+1,-1);
+    for u=1:image_batch
+        
+        %     columns = ['A1','B1','C1','D1','E1','F1','G1','H1','I1','J1'];
+        %     xlswrite('weight_15.xlsx',results{1});
+        %     xlswrite('weight_16.xlsx',results{4});
+        
+        [m, i] = max(results{numLayers}(:,u));
+        m
+        if(m >= p)
+            %                 image_id = image_batch*(r-1)+u;
+            testLabels = [testLabels; test_label(:,u)];
+            %               testLabels = [testLabels; labels(r)];
+            clusters = [clusters; i];
+           
+        else
+            %                 disp(unclassified);
+            unclassified = unclassified + 1;
+            
+        end
+    end
+end
 
 plotPerformance([1 : iterations]', norms, testLabels, clusters, [1, 2, 3]);
 
