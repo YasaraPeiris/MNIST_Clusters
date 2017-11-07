@@ -12,6 +12,7 @@ images = images(:, selected');
 [~, c] = size(images);
 % images(c) = [];
 
+
 selected_1 = find( labels == 1 );
 
 labels_train_1 = labels(selected_1);
@@ -26,17 +27,25 @@ images_train_2 = images(:, selected_2');
 [~, c_1] = size(images_train_1);
 [~, c_2] = size(images_train_2);
 image_batch = 10;
-newDataSize = min(c_1,c_2);
+newDataSize = min(c_1,c_2)*2;
 newDataSize = min(newDataSize,dataSize);
 newIterations = fix(newDataSize/image_batch);
+trainingIterations = 2;
+shuffle = randperm(c);
+labels = labels(shuffle, :);
+images = images(:, shuffle);
+
+
 testImageStartId = newIterations*image_batch;
 test_image = [];
 test_label = [];
 
-for i =1:image_batch
+for i =1:image_batch*10
+    
     test_image  = [test_image mat2gray(images(:,testImageStartId+i ))];
     test_label = [test_label labels(testImageStartId+i)];
-    test_label
+    
+    
 end
 % xlswrite('test.xlsx',test_image);
 % xlswrite('label.xlsx',test_label);
@@ -58,7 +67,7 @@ drawnow;
 %showFinalImage(weights{1});
 %temp = weights;
 
-net = Network_new([784, layerset, 2]);
+net = Network_new([784, layerset,8]);
 numLayers = net.numLayers;
 tempW = net.feedforwardConnections;
 %tempW = net.lateralConnections;
@@ -73,50 +82,51 @@ test_count = 0;
 pow = 1;
 count_labels_1=0;
 count_labels_2=0;
-for r= 1:newIterations/2
-    images_new_1 = [];
-    images_new_2 = [];
-    images_new = [];
-    
-    
-    for k=1:image_batch
-        image_id = image_batch*(r-1)+k;
-        images_new_1 = [images_new_1 mat2gray(images_train_1(:, image_id))];
-        images_new_2 = [images_new_2 mat2gray(images_train_2(:, image_id))];
-    end
-    images_new = [images_new images_new_1];
-    images_new = [images_new images_new_2];
-    
-end
 
-for r= 1:newIterations
-    results = net.getOutput(images_new,r);
-    %
-    %
-    %     for layerLevel = 1: numLayers
-    %         results{layerLevel} = (results_1{layerLevel} + results_2{layerLevel})./2;
-    %     end
-    
-    time = tic;
-    net.STDP_update(results,r);
-    updateTime = updateTime + toc(time);
-    for u = 1 : image_batch
+for j=1:trainingIterations
+    for r= 1:newIterations/2
+        images_new_1 = [];
+        images_new_2 = [];
+        images_new = [];
         
-        norms = [norms; zeros(1, numLayers - 1)];
         
-        weights = net.feedforwardConnections;
-        for k = 1 : numLayers - 1
+        for k=1:image_batch
+            image_id = image_batch*(r-1)+k;
+            images_new_1 = [images_new_1 mat2gray(images_train_1(:, image_id))];
+            images_new_2 = [images_new_2 mat2gray(images_train_2(:, image_id))];
+        end
+        images_new = [images_new images_new_1];
+        images_new = [images_new images_new_2];
+        
+    end
+    for r= 1:newIterations
+        results = net.getOutput(images_new,r);
+        %
+        %
+        %     for layerLevel = 1: numLayers
+        %         results{layerLevel} = (results_1{layerLevel} + results_2{layerLevel})./2;
+        %     end
+        
+        time = tic;
+        net.STDP_update(results,r);
+        updateTime = updateTime + toc(time);
+        for u = 1 : image_batch
             
-            norms(end, k) = norm(weights{k}(:,u) - tempW{k}(:,u),'fro') / numel(weights{k}(:,u));
-            tempW{k}(:,u) = weights{k}(:,u);
+            norms = [norms; zeros(1, numLayers - 1)];
+            
+            weights = net.feedforwardConnections;
+            for k = 1 : numLayers - 1
+                
+                norms(end, k) = norm(weights{k}(:,u) - tempW{k}(:,u),'fro') / numel(weights{k}(:,u));
+                tempW{k}(:,u) = weights{k}(:,u);
+                
+            end
             
         end
         
+        
     end
-    
-    
 end
-
 [~,margin] = size(test_image);
 
 for h = 1: margin/image_batch
@@ -125,7 +135,7 @@ for h = 1: margin/image_batch
     for k=1:image_batch
         
         image_id = image_batch*(h-1)+k;
-
+        
         test_image_batch = [test_image_batch test_image(:,image_id)];
         
         
@@ -133,7 +143,7 @@ for h = 1: margin/image_batch
     
     
     results = net.getOutput(test_image_batch,newIterations+1,-1);
-   
+    %    xlswrite(h,results);
     for u=1:image_batch
         
         %     columns = ['A1','B1','C1','D1','E1','F1','G1','H1','I1','J1'];
@@ -141,7 +151,7 @@ for h = 1: margin/image_batch
         %     xlswrite('weight_16.xlsx',results{4});
         
         [m, i] = max(results{numLayers}(:,u));
-        m
+        
         if(m >= p)
             %                 image_id = image_batch*(r-1)+u;
             testLabels = [testLabels; test_label(:,u)];
@@ -158,7 +168,7 @@ end
 
 
 
-plotPerformance([1 : newIterations*image_batch]', norms, testLabels, clusters, [1, 2, 3]);
+plotPerformance([1 : newIterations*image_batch*trainingIterations]', norms, testLabels, clusters, [1, 2, 3]);
 
 % disp(['Unclassified: ', int2str(unclassified), ' out of ', int2str(dataSize - trainingSize)]);
 %
@@ -173,13 +183,13 @@ for r = 1 : numLayers - 1
     
 end
 
-%{
-for i = 1 : numLayers - 1
-    
-    showFinalImage(weights{i});
-   
-end
-%}
+
+% for i = 1 : numLayers - 1
+%
+%     showFinalImage(weights{i});
+%
+% end
+
 
 %showFinalImage([temp{1}, max(max(weights{1}))* ones(layers(2), 5), weights{1}]);
 

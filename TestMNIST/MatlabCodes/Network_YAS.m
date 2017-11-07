@@ -160,10 +160,11 @@ classdef Network_new < handle
               if(iteration>this_totalRounds)
 
                       xlswrite('final_3_5.xlsx',layers{3});
-                        xlswrite('final_4_5.xlsx',layers{4});
+                      xlswrite('final_4_5.xlsx',layers{4});
               end
            
         end
+        
         
         function STDP_update(obj, layers, r)
             
