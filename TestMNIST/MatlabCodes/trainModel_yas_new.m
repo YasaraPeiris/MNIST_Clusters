@@ -1,45 +1,44 @@
 function trainModel_yas_new(layerset, dataSize) % Using Oja's rule
 
-trainingRatio = 0.8;
 p = 0;
 
 images = loadTrainImages();
 labels = loadTrainLabels();
 
-selected = find(labels == 2 | labels == 1 );
+selected = find(labels == 4 | labels == 1 );
 labels = labels(selected);
 images = images(:, selected');
 [~, c] = size(images);
-% images(c) = [];
 
+% images(c) = [];
+% shuffle = randperm(c);
+% labels = labels(shuffle, :);
+% images = images(:, shuffle);
 
 selected_1 = find( labels == 1 );
-
 labels_train_1 = labels(selected_1);
 images_train_1 = images(:, selected_1');
 
 
-selected_2 = find( labels == 2 );
+selected_2 = find( labels == 4 );
 labels_train_2 = labels(selected_2);
 images_train_2 = images(:, selected_2');
 
 
 [~, c_1] = size(images_train_1);
 [~, c_2] = size(images_train_2);
-image_batch = 5;
+
+image_batch = 10;
 newDataSize = min(c_1,c_2)*2;
 newDataSize = min(newDataSize,dataSize);
 newIterations = fix(newDataSize/image_batch);
 trainingIterations = 1;
-shuffle = randperm(c);
-labels = labels(shuffle, :);
-images = images(:, shuffle);
-
 
 testImageStartId = newIterations*image_batch/2;
+
 test_image = [];
 test_label = [];
-testCount = image_batch*20;
+testCount = image_batch*10;
 for i =1:testCount/2
     
     test_image  = [test_image, images_train_1(:,testImageStartId+i )];
@@ -49,7 +48,7 @@ for i =1:testCount/2
     
 end
 [~, d] = size(test_image);
-d
+
 shuffle_t = randperm(d);
 test_label = test_label(shuffle_t, :);
 test_image = test_image(:, shuffle_t);
@@ -102,12 +101,6 @@ for j=1:trainingIterations
     end
     for r= 1:newIterations
         results = net.getOutput(images_new,r);
-        %
-        %
-        %     for layerLevel = 1: numLayers
-        %         results{layerLevel} = (results_1{layerLevel} + results_2{layerLevel})./2;
-        %     end
-        
         time = tic;
         net.STDP_update(results,r);
         updateTime = updateTime + toc(time);
@@ -131,7 +124,7 @@ end
 [~,margin] = size(test_image);
 
 for h = 1: margin/image_batch - 1 
-    disp(h);
+    
     test_image_batch=[];
     for k=1:image_batch
         
@@ -142,6 +135,7 @@ for h = 1: margin/image_batch - 1
         
     end
     
+    [l,m]= size(test_image_batch);
     
     results = net.getOutput(test_image_batch,newIterations+1,-1);
     %    xlswrite(h,results);
@@ -166,8 +160,6 @@ for h = 1: margin/image_batch - 1
         end
     end
 end
-
-
 
 plotPerformance([1 : newIterations*image_batch*trainingIterations]', norms, testLabels, clusters, [1, 2, 3]);
 

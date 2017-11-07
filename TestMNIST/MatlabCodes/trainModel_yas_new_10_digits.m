@@ -130,7 +130,7 @@ for h = 1: margin/image_batch
         m
         if(m >= p)
             %                 image_id = image_batch*(r-1)+u;
-            testLabels = [testLabels; test_label(:,u)];
+            testLabels = [testLabels; test_label((h-1)*image_batch+i)];
             %               testLabels = [testLabels; labels(r)];
             clusters = [clusters; i];
             disp(i)

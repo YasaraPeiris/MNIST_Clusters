@@ -41,10 +41,10 @@ classdef Network_new < handle
         
         function createFeedforward(obj)
             
-            %             if exist(obj.weightFile, 'file') == 2
-            %                 load(obj.weightFile, 'feedforwardConnections');
-            %                 obj.feedforwardConnections = feedforwardConnections;
-            %             else
+                        if exist(obj.weightFile, 'file') == 2
+                            load(obj.weightFile, 'feedforwardConnections');
+                            obj.feedforwardConnections = feedforwardConnections;
+                        else
             
             obj.feedforwardConnections = cell([1, obj.numLayers - 1]);
             
@@ -59,7 +59,7 @@ classdef Network_new < handle
                 %                        obj.feedforwardConnections{i} =   ones([obj.layerStruct(i+1),obj.layerStruct(i)]);
             end
             
-            %              end
+                         end
             
             obj.ffcheck = zeros(1, obj.numLayers - 1);
             
@@ -104,7 +104,7 @@ classdef Network_new < handle
                 %                 if r==1 & iteration==1
                 %                     xlswrite('total_product_iteration_1_r1_after_div.xlsx',total_product);
                 %                     end
-                temp = 0.001*(total_product - 3*n^2*((mean_A')*(mean_B))');
+                temp = 0.001*(total_product - 9*n*((mean_A')*(mean_B))');
                 %                temp = total_product - 0.75*((mean_A')*(mean_B))';
                 %               if r==1 || r==2
                 
@@ -287,7 +287,7 @@ end
                 %}
                 
                 layers{k + 1} = zscore(layers{k + 1});
-                 if k==1 || k==2
+                 if k<obj.numLayers-1
                      layers{k + 1} = tanh(layers{k + 1});
                  else
                 layers{k + 1} = sigmf(layers{k + 1}, [1, 0]);
