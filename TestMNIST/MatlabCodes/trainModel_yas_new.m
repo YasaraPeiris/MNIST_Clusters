@@ -38,7 +38,7 @@ testImageStartId = newIterations*image_batch/2;
 
 test_image = [];
 test_label = [];
-testCount = image_batch*10;
+testCount = image_batch*20;
 for i =1:testCount/2
     
     test_image  = [test_image, images_train_1(:,testImageStartId+i )];
@@ -72,7 +72,7 @@ drawnow;
 %showFinalImage(weights{1});
 %temp = weights;
 
-net = Network_new([784, layerset,10]);
+net = Network_new([784, layerset,2]);
 numLayers = net.numLayers;
 tempW = net.feedforwardConnections;
 %tempW = net.lateralConnections;
@@ -101,6 +101,7 @@ for j=1:trainingIterations
     end
     for r= 1:newIterations
         results = net.getOutput(images_new,r);
+        
         time = tic;
         net.STDP_update(results,r);
         updateTime = updateTime + toc(time);
@@ -123,7 +124,7 @@ for j=1:trainingIterations
 end
 [~,margin] = size(test_image);
 
-for h = 1: margin/image_batch - 1 
+for h = 1: margin/image_batch 
     
     test_image_batch=[];
     for k=1:image_batch
