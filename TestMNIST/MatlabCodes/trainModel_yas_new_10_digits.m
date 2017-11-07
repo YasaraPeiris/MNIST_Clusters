@@ -36,9 +36,9 @@ test_label = [];
 size(images(:,testImageStartId ))
 
 
-for i =1:image_batch
-    test_image  = [test_image mat2gray(images(:,testImageStartId+i ))];
-    test_label = [test_label labels(testImageStartId+i)];
+for i =1:image_batch*10
+    test_image  = [test_image, (images(:,testImageStartId+i ))];
+    test_label = [test_label; labels(testImageStartId+i)];
     
 end
 % xlswrite('test.xlsx',test_image);
@@ -113,7 +113,7 @@ for h = 1: margin/image_batch
         
         image_id = image_batch*(h-1)+k;
         
-        test_image_batch = [test_image_batch test_image(:,image_id)];
+        test_image_batch = [test_image_batch mat2gray(test_image(:,image_id))];
         
         
     end

@@ -26,27 +26,33 @@ images_train_2 = images(:, selected_2');
 
 [~, c_1] = size(images_train_1);
 [~, c_2] = size(images_train_2);
-image_batch = 10;
+image_batch = 5;
 newDataSize = min(c_1,c_2)*2;
 newDataSize = min(newDataSize,dataSize);
 newIterations = fix(newDataSize/image_batch);
-trainingIterations = 2;
+trainingIterations = 1;
 shuffle = randperm(c);
 labels = labels(shuffle, :);
 images = images(:, shuffle);
 
 
-testImageStartId = newIterations*image_batch;
+testImageStartId = newIterations*image_batch/2;
 test_image = [];
 test_label = [];
-
-for i =1:image_batch*10
+testCount = image_batch*20;
+for i =1:testCount/2
     
-    test_image  = [test_image mat2gray(images(:,testImageStartId+i ))];
-    test_label = [test_label labels(testImageStartId+i)];
-    
+    test_image  = [test_image, images_train_1(:,testImageStartId+i )];
+    test_image  = [test_image, images_train_2(:,testImageStartId+i )];
+    test_label = [test_label; labels_train_1(testImageStartId+i)];
+    test_label = [test_label; labels_train_2(testImageStartId+i)];
     
 end
+[~, d] = size(test_image);
+d
+shuffle_t = randperm(d);
+test_label = test_label(shuffle_t, :);
+test_image = test_image(:, shuffle_t);
 % xlswrite('test.xlsx',test_image);
 % xlswrite('label.xlsx',test_label);
 
@@ -67,7 +73,7 @@ drawnow;
 %showFinalImage(weights{1});
 %temp = weights;
 
-net = Network_new([784, layerset,8]);
+net = Network_new([784, layerset,10]);
 numLayers = net.numLayers;
 tempW = net.feedforwardConnections;
 %tempW = net.lateralConnections;
@@ -77,11 +83,6 @@ temp = net.feedforwardConnections;
 % xlswrite('firstfeed_3.xlsx',temp{3});
 net.iterationImages = newIterations;
 
-image_count = 0;
-test_count = 0;
-pow = 1;
-count_labels_1=0;
-count_labels_2=0;
 
 for j=1:trainingIterations
     for r= 1:newIterations/2
@@ -129,14 +130,14 @@ for j=1:trainingIterations
 end
 [~,margin] = size(test_image);
 
-for h = 1: margin/image_batch
+for h = 1: margin/image_batch - 1 
     disp(h);
     test_image_batch=[];
     for k=1:image_batch
         
         image_id = image_batch*(h-1)+k;
         
-        test_image_batch = [test_image_batch test_image(:,image_id)];
+        test_image_batch = [test_image_batch mat2gray(test_image(:,image_id))];
         
         
     end
@@ -154,7 +155,7 @@ for h = 1: margin/image_batch
         
         if(m >= p)
             %                 image_id = image_batch*(r-1)+u;
-            testLabels = [testLabels; test_label(:,u)];
+            testLabels = [testLabels; test_label(((h-1)*image_batch)+u)];
             %               testLabels = [testLabels; labels(r)];
             clusters = [clusters; i];
             disp(i)
@@ -195,7 +196,7 @@ end
 
 %showFinalImage(weights{1});
 
-showFinalImage(abs(weights{1} - temp{1}));
+% showFinalImage(abs(weights{1} - temp{1}));
 
 %clust = kmeans(images(:, trainingSize + 1 : dataSize)', 8);
 
