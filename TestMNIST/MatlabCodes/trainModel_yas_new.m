@@ -28,7 +28,7 @@ images_train_2 = images(:, selected_2');
 [~, c_1] = size(images_train_1);
 [~, c_2] = size(images_train_2);
 
-image_batch = 10;
+image_batch = 5;
 newDataSize = min(c_1,c_2)*2;
 newDataSize = min(newDataSize,dataSize);
 newIterations = fix(newDataSize/image_batch);
