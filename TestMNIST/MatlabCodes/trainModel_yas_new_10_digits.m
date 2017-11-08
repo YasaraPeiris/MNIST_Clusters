@@ -6,7 +6,7 @@ p = 0;
 images = loadTrainImages();
 labels = loadTrainLabels();
 
-selected = find(labels == 2 | labels == 1 );
+selected = find(labels == 2 | labels == 1 | labels ==5 );
 labels = labels(selected);
 images = images(:, selected');
 [~, c] = size(images);
@@ -19,11 +19,17 @@ images_train_1 = images(:, selected_1');
 selected_2 = find( labels == 2 );
 labels_train_2 = labels(selected_2);
 images_train_2 = images(:, selected_2');
+
+selected_3 = find( labels == 5 );
+labels_train_3 = labels(selected_3);
+images_train_3 = images(:, selected_3');
 %
 %
 [~, c_1] = size(images_train_1);
 [~, c_2] = size(images_train_2);
-newDataSize = min(c_1,c_2)*2;
+[~, c_3] = size(images_train_2);
+intermediateDataSize = min(c_1,c_3);
+newDataSize = min(intermediateDataSize,c_2)*2;
 
 
 image_batch = 10;

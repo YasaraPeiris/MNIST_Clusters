@@ -5,7 +5,7 @@ p = 0;
 images = loadTrainImages();
 labels = loadTrainLabels();
 
-selected = find(labels == 4 | labels == 1 );
+selected = find(labels == 4 | labels == 1 | labels == 5);
 labels = labels(selected);
 images = images(:, selected');
 [~, c] = size(images);
@@ -19,33 +19,39 @@ selected_1 = find( labels == 1 );
 labels_train_1 = labels(selected_1);
 images_train_1 = images(:, selected_1');
 
-
 selected_2 = find( labels == 4 );
 labels_train_2 = labels(selected_2);
 images_train_2 = images(:, selected_2');
 
+selected_3 = find( labels == 5 );
+labels_train_3 = labels(selected_3);
+images_train_3 = images(:, selected_3');
 
 [~, c_1] = size(images_train_1);
 [~, c_2] = size(images_train_2);
+[~, c_3] = size(images_train_3);
 
 image_batch = 5;
-newDataSize = min(c_1,c_2)*2;
+intermediateDataSize = min(c_1,c_3);
+newDataSize = min(intermediateDataSize,c_2)*2;
 newDataSize = min(newDataSize,dataSize);
 newIterations = fix(newDataSize/image_batch);
 trainingIterations = 1;
 
-testImageStartId = newIterations*image_batch/2;
+testImageStartId = fix(newIterations*image_batch/3);
 
 test_image = [];
 test_label = [];
 testCount = image_batch*20;
-for i =1:testCount/2
+for i =1:fix(testCount/3)
     
     test_image  = [test_image, images_train_1(:,testImageStartId+i )];
     test_image  = [test_image, images_train_2(:,testImageStartId+i )];
+    test_image  = [test_image, images_train_3(:,testImageStartId+i )];
     test_label = [test_label; labels_train_1(testImageStartId+i)];
     test_label = [test_label; labels_train_2(testImageStartId+i)];
-    
+    test_label = [test_label; labels_train_3(testImageStartId+i)];
+   
 end
 [~, d] = size(test_image);
 
@@ -87,6 +93,7 @@ for j=1:trainingIterations
     for r= 1:newIterations/2
         images_new_1 = [];
         images_new_2 = [];
+        images_new_3 = [];
         images_new = [];
         
         
@@ -94,6 +101,7 @@ for j=1:trainingIterations
             image_id = image_batch*(r-1)+k;
             images_new_1 = [images_new_1 mat2gray(images_train_1(:, image_id))];
             images_new_2 = [images_new_2 mat2gray(images_train_2(:, image_id))];
+            images_new_3 = [images_new_3 mat2gray(images_train_3(:, image_id))];
         end
         images_new = [images_new images_new_1];
         images_new = [images_new images_new_2];

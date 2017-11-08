@@ -41,10 +41,10 @@ classdef Network_new < handle
         
         function createFeedforward(obj)
             
-                        if exist(obj.weightFile, 'file') == 2
-                            load(obj.weightFile, 'feedforwardConnections');
-                            obj.feedforwardConnections = feedforwardConnections;
-                        else
+%                         if exist(obj.weightFile, 'file') == 2
+%                             load(obj.weightFile, 'feedforwardConnections');
+%                             obj.feedforwardConnections = feedforwardConnections;
+%                         else
             
             obj.feedforwardConnections = cell([1, obj.numLayers - 1]);
             
@@ -59,7 +59,7 @@ classdef Network_new < handle
                 %                        obj.feedforwardConnections{i} =   ones([obj.layerStruct(i+1),obj.layerStruct(i)]);
             end
             
-                         end
+%                         end
             
             obj.ffcheck = zeros(1, obj.numLayers - 1);
             
