@@ -6,34 +6,35 @@ p = 0;
 images = loadTrainImages();
 labels = loadTrainLabels();
 
-selected = find(labels == 2 | labels == 1 | labels ==7 );
-labels = labels(selected);
-images = images(:, selected');
+% selected = find(labels == 2 | labels == 1 | labels ==7 );
+% labels = labels(selected);
+% images = images(:, selected');
 [~, c] = size(images);
 % images(c) = [];
 %
-selected_1 = find( labels == 1 );
-labels_train_1 = labels(selected_1);
-images_train_1 = images(:, selected_1');
+% selected_1 = find( labels == 1 );
+% labels_train_1 = labels(selected_1);
+% images_train_1 = images(:, selected_1');
+% %
+% selected_2 = find( labels ==7 );
+% labels_train_2 = labels(selected_2);
+% images_train_2 = images(:, selected_2');
+% 
+% selected_3 = find( labels == 4 );
+% labels_train_3 = labels(selected_3);
+% images_train_3 = images(:, selected_3');
 %
-selected_2 = find( labels ==7 );
-labels_train_2 = labels(selected_2);
-images_train_2 = images(:, selected_2');
 
-selected_3 = find( labels == 4 );
-labels_train_3 = labels(selected_3);
-images_train_3 = images(:, selected_3');
-%
-
-[~, c_1] = size(images_train_1);
-[~, c_2] = size(images_train_2);
-[~, c_3] = size(images_train_2);
-intermediateDataSize = min(c_1,c_3);
-newDataSize = min(intermediateDataSize,c_2)*2;
+% [~, c_1] = size(images_train_1);
+% [~, c_2] = size(images_train_2);
+% [~, c_3] = size(images_train_2);
+% intermediateDataSize = min(c_1,c_3);
+% newDataSize = min(intermediateDataSize,c_2)*2;
 
 
-image_batch = 10;
-newDataSize = min(newDataSize,dataSize);
+image_batch = 5;
+% newDataSize = min(newDataSize,dataSize);
+newDataSize = min(c,dataSize);
 newIterations = fix(newDataSize/image_batch);
 testImageStartId = newIterations*image_batch;
 trainingIterations = 1;
@@ -42,7 +43,7 @@ test_label = [];
 size(images(:,testImageStartId ))
 
 
-for i =1:image_batch*10
+for i =1:image_batch*1000
     test_image  = [test_image, (images(:,testImageStartId+i ))];
     test_label = [test_label; labels(testImageStartId+i)];
     
@@ -81,6 +82,7 @@ for j =1 : trainingIterations
     labels = labels(shuffle, :);
     images = images(:, shuffle);
     for r= 1:newIterations
+        
         images_new = [];
         
         for k=1:image_batch
@@ -89,6 +91,7 @@ for j =1 : trainingIterations
             images_new = [images_new mat2gray(images(:, image_id))];
             
         end
+        
         results = net.getOutput(images_new,r);
         
         time = tic;
@@ -136,7 +139,7 @@ for h = 1: margin/image_batch
         m
         if(m >= p)
             %                 image_id = image_batch*(r-1)+u;
-            testLabels = [testLabels; test_label((h-1)*image_batch+i)];
+            testLabels = [testLabels; test_label((h-1)*image_batch+u)];
             %               testLabels = [testLabels; labels(r)];
             clusters = [clusters; i];
             disp(i)

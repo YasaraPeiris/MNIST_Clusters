@@ -8,7 +8,7 @@ images = loadTrainImages();
 labels = loadTrainLabels();
 
 
-selected = find(labels == 2 | labels == 1 );
+selected = find(labels ==  | labels == 1 );
 labels = labels(selected);
 images = images(:, selected');
 

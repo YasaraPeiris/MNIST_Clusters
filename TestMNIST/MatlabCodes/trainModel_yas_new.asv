@@ -5,7 +5,7 @@ p = 0;
 images = loadTrainImages();
 labels = loadTrainLabels();
 
-selected = find(labels == 4 | labels == 1 );
+selected = find(labels == 9 | labels == 1 );
 labels = labels(selected);
 images = images(:, selected');
 [~, c] = size(images);

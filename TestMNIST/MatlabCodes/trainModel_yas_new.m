@@ -5,7 +5,7 @@ p = 0;
 images = loadTrainImages();
 labels = loadTrainLabels();
 
-selected = find(labels == 7 | labels == 1 );
+selected = find(labels == 9 | labels == 1 );
 labels = labels(selected);
 images = images(:, selected');
 [~, c] = size(images);
@@ -20,7 +20,7 @@ labels_train_1 = labels(selected_1);
 images_train_1 = images(:, selected_1');
 
 
-selected_2 = find( labels == 7 );
+selected_2 = find( labels == 9 );
 labels_train_2 = labels(selected_2);
 images_train_2 = images(:, selected_2');
 
