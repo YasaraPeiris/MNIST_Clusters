@@ -38,6 +38,29 @@ classdef Network_new < handle
     end
     
     methods (Access = private)
+        function createLateral(obj)
+            
+%             if exist(obj.weightFile, 'file') == 2
+%                 load(obj.weightFile, 'lateralConnections');
+%                 obj.lateralConnections = lateralConnections;
+%             else
+            
+                obj.lateralConnections = cell([1, obj.numLayers - 1]);
+
+                for i = 1 : obj.numLayers - 1
+
+                    %obj.lateralConnections{i} = rand(layerStruct(i + 1),layerStruct(i + 1));
+                    obj.lateralConnections{i} = - normr(binornd(1, 0.2, obj.layerStruct(i + 1), obj.layerStruct(i + 1)));
+
+                    obj.lateralConnections{i}(1 : obj.layerStruct(i + 1) + 1 : obj.layerStruct(i + 1) * obj.layerStruct(i + 1)) = 1;
+
+                end
+                
+%             end
+            
+            obj.ltcheck = zeros(1, obj.numLayers - 1);
+            
+        end
         
         function createFeedforward(obj)
             

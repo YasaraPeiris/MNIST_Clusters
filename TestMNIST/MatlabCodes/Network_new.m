@@ -38,6 +38,29 @@ classdef Network_new < handle
     end
     
     methods (Access = private)
+        function createLateral(obj)
+            
+%             if exist(obj.weightFile, 'file') == 2
+%                 load(obj.weightFile, 'lateralConnections');
+%                 obj.lateralConnections = lateralConnections;
+%             else
+            
+                obj.lateralConnections = cell([1, obj.numLayers - 1]);
+
+                for i = 1 : obj.numLayers - 1
+
+                    %obj.lateralConnections{i} = rand(layerStruct(i + 1),layerStruct(i + 1));
+                    obj.lateralConnections{i} = - normr(binornd(1, 0.2, obj.layerStruct(i + 1), obj.layerStruct(i + 1)));
+
+                    obj.lateralConnections{i}(1 : obj.layerStruct(i + 1) + 1 : obj.layerStruct(i + 1) * obj.layerStruct(i + 1)) = 1;
+
+                end
+                
+%             end
+            
+            obj.ltcheck = zeros(1, obj.numLayers - 1);
+            
+        end
         
         function createFeedforward(obj)
             
@@ -100,18 +123,14 @@ classdef Network_new < handle
                 %                     xlswrite('total_product_iteration_1_r1_after.xlsx',total_product);
                 %                     end
                 total_product = total_product./n;
-                
                 %                 if r==1 & iteration==1
                 %                     xlswrite('total_product_iteration_1_r1_after_div.xlsx',total_product);
                 %                     end
-                temp = 0.001*(total_product - 6*n*((mean_A')*(mean_B))');
+                temp = 0.001*(2*total_product -7*n*((mean_A')*(mean_B))');
                 %                temp = total_product - 0.75*((mean_A')*(mean_B))';
                 %               if r==1 || r==2
                 
                 %               end
-                
-                
-                
                 %temp = (temp*(exp(-0.008*iteration))/r);
                 
                 %                 end
@@ -129,7 +148,6 @@ classdef Network_new < handle
                 %                 end
                 %
                 weights{r} = (weights{r} + temp);
-                
                 %                  if(iteration == 1 && r==1)
                 %
                 %                     xlswrite('weight_1_a',weights{r}(:,1:50));
@@ -142,7 +160,6 @@ classdef Network_new < handle
                 %
                 %                     xlswrite('weight_3_a.xlsx',weights{r}(:,1:50));
                 %                  end
-                
                 %                  if(iteration == this_totalRounds && r==1)
                 %
                 %                     xlswrite('weight_1_e.xlsx',weights{r});
@@ -163,11 +180,7 @@ classdef Network_new < handle
                 %                      dlmwrite('analyze_2.txt',r,'-append');
                 %                     dlmwrite('analyze_2.txt',' ','-append');
                 %                     dlmwrite('analyze_2.txt',temp(:,1),'-append');
-                %                 end
-                
-                
-                
-                
+                %                
                 if any(temp <= 0)
                     this_check(r) = this_check(r) + 1;
                 end
@@ -202,8 +215,7 @@ classdef Network_new < handle
             obj.weightFile = fullfile(fileparts(which(mfilename)), '..\WeightDatabase\Temp', fileName);
             
             obj.createFeedforward();
-            %              obj.createLateral();
-            
+            obj.createLateral();
             obj.saveWeights();
             
         end
@@ -286,11 +298,11 @@ else
 end
                 %}
                 
-                layers{k + 1} = zscore(layers{k + 1});
+                layers{k + 1} = zscore(layers{k + 1},1);
                  if k<obj.numLayers-1
                      layers{k + 1} = tanh(layers{k + 1});
                  else
-                layers{k + 1} = sigmf(layers{k + 1}, [1, 0]);
+                layers{k + 1} = sigmf(layers{k + 1}, [10, 0]);
                  end
                 %                 end
                 %                  layers{k + 1} = 1./(1+exp(-layers{k + 1}));
