@@ -5,7 +5,7 @@ p = 0;
 images = loadTrainImages();
 labels = loadTrainLabels();
 
-selected = find(labels == 4 | labels == 3 );
+selected = find(labels == 1 | labels == 0 );
 labels = labels(selected);
 images = images(:, selected');
 [~, c] = size(images);
@@ -15,12 +15,12 @@ images = images(:, selected');
 % labels = labels(shuffle, :);
 % images = images(:, shuffle);
 
-selected_1 = find( labels == 4 );
+selected_1 = find( labels == 0 );
 labels_train_1 = labels(selected_1);
 images_train_1 = images(:, selected_1');
 
 
-selected_2 = find( labels == 3 );
+selected_2 = find( labels == 1 );
 labels_train_2 = labels(selected_2);
 images_train_2 = images(:, selected_2');
 
