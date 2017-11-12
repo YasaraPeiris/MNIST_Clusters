@@ -10,10 +10,10 @@ end
 
 if ~isempty(testLabels)
     
-%     if ismember(2, graphs) 
-%         figure
-%         silhouette(testLabels, clusters);
-%     end
+    if ismember(2, graphs) 
+        figure
+        silhouette(testLabels, clusters);
+    end
     
     if ismember(3, graphs)
         uniqueClust = unique(clusters);

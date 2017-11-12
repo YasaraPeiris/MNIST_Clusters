@@ -20,7 +20,7 @@ labels_train_1 = labels(selected_1);
 images_train_1 = images(:, selected_1');
 
 
-selected_2 = find( labels == 7 );
+selected_2 = find( labels == 9 );
 labels_train_2 = labels(selected_2);
 images_train_2 = images(:, selected_2');
 
@@ -59,7 +59,8 @@ testLabels = [];
 clusters = [];
 
 unclassified = 0;
-norms = [];
+norms1 = [];
+norms2 = [];
 
 updateTime = 0.0;
 
@@ -74,7 +75,8 @@ drawnow;
 
 net = Network_new([784, layerset,2]);
 numLayers = net.numLayers;
-tempW = net.feedforwardConnections;
+tempW1 = net.feedforwardConnections;
+tempW2 = net.lateralConnections;
 %tempW = net.lateralConnections;
 temp = net.feedforwardConnections;
 %  xlswrite('firstfeed_1.xlsx',temp{1});
@@ -107,15 +109,27 @@ for j=1:trainingIterations
         updateTime = updateTime + toc(time);
         for u = 1 : image_batch
             
-            norms = [norms; zeros(1, numLayers - 1)];
+            norms1 = [norms1; zeros(1, numLayers - 1)];
             
             weights = net.feedforwardConnections;
             for k = 1 : numLayers - 1
                 
-                norms(end, k) = norm(weights{k}(:,u) - tempW{k}(:,u),'fro') / numel(weights{k}(:,u));
-                tempW{k}(:,u) = weights{k}(:,u);
+                norms(end, k) = norm(weights{k}(:,u) - tempW1{k}(:,u),'fro') / numel(weights{k}(:,u));
+                tempW1{k}(:,u) = weights{k}(:,u);
                 
             end
+            
+            norms2 = [norms2; zeros(1, numLayers - 1)];
+            
+            weights = net.lateralConnections;
+            for k = 1 : numLayers - 1
+                
+                norms2(end, k) = norm(weights{k}(:,u) - tempW2{k}(:,u),'fro') / numel(weights{k}(:,u));
+                tempW2{k}(:,u) = weights{k}(:,u);
+                
+            end
+            
+            norms = [norms1, ]
             
         end
         

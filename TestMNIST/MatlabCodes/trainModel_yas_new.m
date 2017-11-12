@@ -5,7 +5,7 @@ p = 0;
 images = loadTrainImages();
 labels = loadTrainLabels();
 
-selected = find(labels == 9 | labels == 1 );
+selected = find(labels == 4 | labels == 3 );
 labels = labels(selected);
 images = images(:, selected');
 [~, c] = size(images);
@@ -15,12 +15,12 @@ images = images(:, selected');
 % labels = labels(shuffle, :);
 % images = images(:, shuffle);
 
-selected_1 = find( labels == 1 );
+selected_1 = find( labels == 4 );
 labels_train_1 = labels(selected_1);
 images_train_1 = images(:, selected_1');
 
 
-selected_2 = find( labels == 9 );
+selected_2 = find( labels == 3 );
 labels_train_2 = labels(selected_2);
 images_train_2 = images(:, selected_2');
 
@@ -38,7 +38,7 @@ testImageStartId = newIterations*image_batch/2;
 
 test_image = [];
 test_label = [];
-testCount = image_batch*20;
+testCount = image_batch*200;
 for i =1:testCount/2
     
     test_image  = [test_image, images_train_1(:,testImageStartId+i )];
