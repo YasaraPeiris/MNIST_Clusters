@@ -3,9 +3,11 @@ function trainModel_yas_new(layerset, dataSize) % Using Oja's rule
 p = 0;
 
 images = loadTrainImages();
+% images = getCenter(images);
+% images =getTriple(images);
 labels = loadTrainLabels();
 
-selected = find(labels == 4 | labels == 1 | labels == 5);
+selected = find(labels == 5 | labels == 1 | labels == 0);
 labels = labels(selected);
 images = images(:, selected');
 [~, c] = size(images);
@@ -19,11 +21,11 @@ selected_1 = find( labels == 1 );
 labels_train_1 = labels(selected_1);
 images_train_1 = images(:, selected_1');
 
-selected_2 = find( labels == 4 );
+selected_2 = find( labels == 5 );
 labels_train_2 = labels(selected_2);
 images_train_2 = images(:, selected_2');
 
-selected_3 = find( labels == 5 );
+selected_3 = find( labels == 0 );
 labels_train_3 = labels(selected_3);
 images_train_3 = images(:, selected_3');
 
@@ -59,7 +61,7 @@ shuffle_t = randperm(d);
 test_label = test_label(shuffle_t, :);
 test_image = test_image(:, shuffle_t);
 % xlswrite('test.xlsx',test_image);
-% xlswrite('label.xlsx',test_label);
+xlswrite('label.xlsx',test_label);
 
 testLabels = [];
 clusters = [];
@@ -78,7 +80,7 @@ drawnow;
 %showFinalImage(weights{1});
 %temp = weights;
 
-net = Network_new([784, layerset,10]);
+net = Network_new([784, layerset,3]);
 numLayers = net.numLayers;
 tempW = net.feedforwardConnections;
 %tempW = net.lateralConnections;

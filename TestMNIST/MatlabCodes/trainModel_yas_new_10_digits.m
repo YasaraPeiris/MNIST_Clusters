@@ -6,19 +6,19 @@ p = 0;
 images = loadTrainImages();
 labels = loadTrainLabels();
 
-% selected = find(labels == 2 | labels == 1 | labels ==7 );
-% labels = labels(selected);
-% images = images(:, selected');
+selected = find(labels == 0 | labels ==1 );
+labels = labels(selected);
+images = images(:, selected');
 [~, c] = size(images);
 % images(c) = [];
 %
-% selected_1 = find( labels == 1 );
-% labels_train_1 = labels(selected_1);
-% images_train_1 = images(:, selected_1');
-% %
-% selected_2 = find( labels ==7 );
-% labels_train_2 = labels(selected_2);
-% images_train_2 = images(:, selected_2');
+selected_1 = find( labels == 0 );
+labels_train_1 = labels(selected_1);
+images_train_1 = images(:, selected_1');
+%
+selected_2 = find( labels ==1 );
+labels_train_2 = labels(selected_2);
+images_train_2 = images(:, selected_2');
 % 
 % selected_3 = find( labels == 4 );
 % labels_train_3 = labels(selected_3);
@@ -37,15 +37,15 @@ image_batch = 5;
 newDataSize = min(c,dataSize);
 newIterations = fix(newDataSize/image_batch);
 testImageStartId = newIterations*image_batch;
-trainingIterations = 1;
+trainingIterations = 6;
 test_image = [];
 test_label = [];
 size(images(:,testImageStartId ))
-
+[~,d]=size(images);
 
 for i =1:image_batch*1000
-    test_image  = [test_image, (images(:,testImageStartId+i ))];
-    test_label = [test_label; labels(testImageStartId+i)];
+    test_image  = [test_image, (images(:,d-i ))];
+    test_label = [test_label; labels(d-i)];
     
 end
 % xlswrite('test.xlsx',test_image);
@@ -68,7 +68,7 @@ drawnow;
 %showFinalImage(weights{1});
 %temp = weights;
 
-net = Network_new([784, layerset, 10]);
+net = Network_new([784, layerset, 2]);
 numLayers = net.numLayers;
 tempW = net.feedforwardConnections;
 %tempW = net.lateralConnections;
@@ -153,7 +153,7 @@ end
 
 
 
-plotPerformance([1 : newIterations*image_batch]', norms, testLabels, clusters, [1, 2, 3]);
+plotPerformance([1 : trainingIterations*newIterations*image_batch]', norms, testLabels, clusters, [1, 2, 3]);
 
 % disp(['Unclassified: ', int2str(unclassified), ' out of ', int2str(dataSize - trainingSize)]);
 %
@@ -188,6 +188,30 @@ showFinalImage(abs(weights{1} - temp{1}));
 
 %disp(clusters);
 
+layers = net.layerStruct;
+r = randi(layers(3), 1, 1);
+W = weights{2}(r, :);
+W = vec2mat(W, 28);
 
+figure
+surf(W)
+colormap(jet);
+
+figure
+for i = 1 : 28
+    
+    subplot(4, 7, i);
+    plot(W(i, :));
+    title(num2str(i));
+    
+end
+
+for i = 1 : 28
+    
+    subplot(4, 7, i);
+    plot(W(:, i));
+    title(num2str(i));
+    
+end
 
 

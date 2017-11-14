@@ -73,8 +73,8 @@ classdef Network_new < handle
             
             for i = 1 : obj.numLayers - 1
                 
-                obj.feedforwardConnections{i} = rand(obj.layerStruct(i + 1),obj.layerStruct(i));
-                %obj.feedforwardConnections{i} = normr(binornd(1, 0.2, obj.layerStruct(i + 1), obj.layerStruct(i)));
+                 obj.feedforwardConnections{i} = rand(obj.layerStruct(i + 1),obj.layerStruct(i));
+%                 obj.feedforwardConnections{i} = normr(binornd(1, 0.2, obj.layerStruct(i + 1), obj.layerStruct(i)));
                 %                     obj.feedforwardConnections{i} = binornd(1, 0.2, obj.layerStruct(i + 1), obj.layerStruct(i));
                 %                     obj.feedforwardConnections{i} = rand(obj.layerStruct(i + 1), obj.layerStruct(i));
                 %                     rowsum = sum(obj.feedforwardConnections{i},2);
@@ -126,10 +126,61 @@ classdef Network_new < handle
                 %                 if r==1 & iteration==1
                 %                     xlswrite('total_product_iteration_1_r1_after_div.xlsx',total_product);
                 %                     end
-                temp = 0.001*(total_product -7*n*((mean_A')*(mean_B))');
-         
+                temp = 0.001*(total_product -5*n*((mean_A')*(mean_B))');
+                %                temp = total_product - 0.75*((mean_A')*(mean_B))';
+                %               if r==1 || r==2
+                
+                %               end
+                %temp = (temp*(exp(-0.008*iteration))/r);
+                
+                %                 end
+                %                 if(iteration == this_totalRounds && r==1)
+                %                     xlswrite('temp_1.xlsx',temp);
+                %                     xlswrite('weight_1',weights{r}(:,1:50));
+                %                 end
+                %                 if(iteration == this_totalRounds && r==2)
+                %                     xlswrite('temp_2.xlsx',temp);
+                %                     xlswrite('weight_2.xlsx',weights{r}(:,1:50));
+                %                 end
+                %                 if(iteration == this_totalRounds && r==3)
+                %                     xlswrite('temp_3.xlsx',temp);
+                %                     xlswrite('weight_3.xlsx',weights{r});
+                %                 end
+                %
                 weights{r} = (weights{r} + temp);
-            
+                %                  if(iteration == 1 && r==1)
+                %
+                %                     xlswrite('weight_1_a',weights{r}(:,1:50));
+                %                 end
+                %                  if(iteration == 1 && r==2)
+                %
+                %                     xlswrite('weight_2_a.xlsx',weights{r}(:,1:50));
+                %                  end
+                %                  if(iteration == 1 && r==3)
+                %
+                %                     xlswrite('weight_3_a.xlsx',weights{r}(:,1:50));
+                %                  end
+                %                  if(iteration == this_totalRounds && r==1)
+                %
+                %                     xlswrite('weight_1_e.xlsx',weights{r});
+                %                 end
+                %                  if(iteration == this_totalRounds && r==2)
+                %
+                %                     xlswrite('weight_2_e.xlsx',weights{r});
+                %                  end
+                %                  if(iteration == this_totalRounds && r==3)
+                %
+                %                     xlswrite('weight_3_e.xlsx',weights{r});
+                %                  end
+                %                 if iteration ==2 && r == 1
+                %
+                %                     dlmwrite('analyze.txt',r,'-append');
+                %                     dlmwrite('analyze.txt',' ','-append');
+                %                     dlmwrite('analyze.txt',weights{r},'-append');
+                %                      dlmwrite('analyze_2.txt',r,'-append');
+                %                     dlmwrite('analyze_2.txt',' ','-append');
+                %                     dlmwrite('analyze_2.txt',temp(:,1),'-append');
+                %                
                 if any(temp <= 0)
                     this_check(r) = this_check(r) + 1;
                 end
@@ -164,7 +215,7 @@ classdef Network_new < handle
             obj.weightFile = fullfile(fileparts(which(mfilename)), '..\WeightDatabase\Temp', fileName);
             
             obj.createFeedforward();
-            obj.createLateral();
+%             obj.createLateral();
             obj.saveWeights();
             
         end
@@ -247,7 +298,7 @@ else
 end
                 %}
                 
-                layers{k + 1} = zscore(layers{k + 1},0);
+                layers{k + 1} = zscore(layers{k + 1});
                  if k<obj.numLayers-1
                      layers{k + 1} = tanh(layers{k + 1});
                  else
