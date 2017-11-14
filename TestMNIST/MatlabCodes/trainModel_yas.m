@@ -96,7 +96,7 @@ for r= 1:iterations/image_batch
         
         norms(end, k) = norm(weights{k}(:,u) - tempW{k}(:,u),'fro') / numel(weights{k}(:,u));
         tempW{k}(:,u) = weights{k}(:,u);
-        %         disp(norms);
+        
     end
     
     end
@@ -104,10 +104,10 @@ end
 
 for h = 1: margin/image_batch
     test_image_batch=[];
+    
     for k=1:image_batch
         
         image_id = image_batch*(h-1)+k;
-
         test_image_batch = [test_image_batch test_image(:,image_id)];
         
         

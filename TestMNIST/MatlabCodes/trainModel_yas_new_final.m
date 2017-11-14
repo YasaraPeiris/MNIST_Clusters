@@ -5,7 +5,7 @@ p = 0;
 images = loadTrainImages();
 labels = loadTrainLabels();
 
-selected = find(labels == 6  | labels == 9 );
+selected = find(labels == 8  | labels == 9 );
 labels = labels(selected);
 images = images(:, selected');
 [~, c] = size(images);
@@ -14,7 +14,7 @@ selected_1 = find( labels == 9 );
 labels_train_1 = labels(selected_1);
 images_train_1 = images(:, selected_1');
 
-selected_2 = find( labels == 6 );
+selected_2 = find( labels == 8 );
 labels_train_2 = labels(selected_2);
 images_train_2 = images(:, selected_2');
 
@@ -133,8 +133,7 @@ for h = 1: margin/image_batch
             testLabels = [testLabels; test_label(((h-1)*image_batch)+u)];
             %               testLabels = [testLabels; labels(r)];
             clusters = [clusters; i];
-            disp(i)
-        else
+                   else
             unclassified = unclassified + 1;
         end
     end

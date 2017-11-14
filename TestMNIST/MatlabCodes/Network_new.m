@@ -126,7 +126,7 @@ classdef Network_new < handle
                 %                 if r==1 & iteration==1
                 %                     xlswrite('total_product_iteration_1_r1_after_div.xlsx',total_product);
                 %                     end
-                temp = 0.001*(total_product -8*n*((mean_A')*(mean_B))');
+                temp = 0.001*(total_product -5*n*((mean_A')*(mean_B))');
                 %                temp = total_product - 0.75*((mean_A')*(mean_B))';
                 %               if r==1 || r==2
                 
@@ -283,7 +283,9 @@ classdef Network_new < handle
             for k = 1 : obj.numLayers - 1
                 
                 %
-                layers{k + 1} = obj.feedforwardConnections{k}* layers{k};
+                if k<obj.numLayers
+                layers{k + 1} = obj.feedforwardConnections{k}* layers{k}+0.0001;
+                end
                 %
                 %                   layers{k + 1} = layers{k + 1}/norm(layers{k + 1},1.0);
                 %                 if k~=obj.numLayers-1
