@@ -1,20 +1,20 @@
-function trainModel_yas_new_final(layerset, dataSize) % Using Oja's rule
+function trainModel_yas_new_final(layerset, dataSize) % Using covariance rule
 
 p = 0;
 
 images = loadTrainImages();
 labels = loadTrainLabels();
 
-selected = find(labels == 1  | labels == 7 );
+selected = find(labels == 6  | labels == 9 );
 labels = labels(selected);
 images = images(:, selected');
 [~, c] = size(images);
 
-selected_1 = find( labels == 1 );
+selected_1 = find( labels == 9 );
 labels_train_1 = labels(selected_1);
 images_train_1 = images(:, selected_1');
 
-selected_2 = find( labels == 7 );
+selected_2 = find( labels == 6 );
 labels_train_2 = labels(selected_2);
 images_train_2 = images(:, selected_2');
 
