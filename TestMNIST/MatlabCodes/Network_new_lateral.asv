@@ -127,7 +127,7 @@ classdef Network_new_lateral < handle
                 %                 if r==1 & iteration==1
                 %                     xlswrite('total_product_iteration_1_r1_after_div.xlsx',total_product);
                 %                     end
-                temp = 0.001*(total_product -5*n*((mean_A')*(mean_B))');
+                temp = 0.001*(total_product -10*n*((mean_A')*(mean_B))');
                 %                temp = total_product - 0.75*((mean_A')*(mean_B))';
                 %               if r==1 || r==2
                 
@@ -135,30 +135,30 @@ classdef Network_new_lateral < handle
                 %temp = (temp*(exp(-0.008*iteration))/r);
                 
                 %                 end
-                if(iteration == this_totalRounds && r==1)
-                    xlswrite('temp_1_layer_final_iteration.xlsx',temp);
-                    xlswrite('weight_1_tot',weights{r}(:,1:50));
-                end
-                if(iteration == this_totalRounds && r==2)
-                    xlswrite('temp_2_layer_final_iteration.xlsx',temp);
-                    xlswrite('weight_2_tot.xlsx',weights{r}(:,1:50));
-                end
-                if(iteration == this_totalRounds && r==3)
-                    xlswrite('temp_3_layer_final_iteration.xlsx',temp);
-                    xlswrite('weight_3_tot.xlsx',weights{r});
-                end
-                if(iteration == 1 && r==1)
-                    xlswrite('temp_1_layer_first_iteration.xlsx',temp);
-                    xlswrite('weight_1_tot',weights{r}(:,1:50));
-                end
-                if(iteration == 1 && r==2)
-                    xlswrite('temp_2_layer_first_iteration.xlsx',temp);
-                    xlswrite('weight_2_tot.xlsx',weights{r}(:,1:50));
-                end
-                if(iteration == 1 && r==3)
-                    xlswrite('temp_3_layer_first_iteration.xlsx',temp);
-                    xlswrite('weight_3_tot.xlsx',weights{r});
-                end
+%                 if(iteration == this_totalRounds && r==1)
+%                     xlswrite('temp_1_layer_final_iteration.xlsx',temp);
+%                     xlswrite('weight_1_tot',weights{r}(:,1:50));
+%                 end
+%                 if(iteration == this_totalRounds && r==2)
+%                     xlswrite('temp_2_layer_final_iteration.xlsx',temp);
+%                     xlswrite('weight_2_tot.xlsx',weights{r}(:,1:50));
+%                 end
+%                 if(iteration == this_totalRounds && r==3)
+%                     xlswrite('temp_3_layer_final_iteration.xlsx',temp);
+%                     xlswrite('weight_3_tot.xlsx',weights{r});
+%                 end
+%                 if(iteration == 1 && r==1)
+%                     xlswrite('temp_1_layer_first_iteration.xlsx',temp);
+%                     xlswrite('weight_1_tot',weights{r}(:,1:50));
+%                 end
+%                 if(iteration == 1 && r==2)
+%                     xlswrite('temp_2_layer_first_iteration.xlsx',temp);
+%                     xlswrite('weight_2_tot.xlsx',weights{r}(:,1:50));
+%                 end
+%                 if(iteration == 1 && r==3)
+%                     xlswrite('temp_3_layer_first_iteration.xlsx',temp);
+%                     xlswrite('weight_3_tot.xlsx',weights{r});
+%                 end
                 %                                   if(iteration == this_totalRounds && r==1)
                 %                                     xlswrite('temp_1_tot.xlsx',temp);
                 %                                     xlswrite('weight_1_tot',weights{r}(:,1:50));
@@ -221,13 +221,13 @@ classdef Network_new_lateral < handle
         end
         
         function STDP_update_lateral(obj, layers, iteration)
-            weights = obj.feedforwardConnections;
+            weights = obj.lateralConnections;
             this_check = obj.ltcheck;
             this_totalRounds = obj.iterationImages;
             %
             parfor r = 1 : obj.numLayers - 1
                 
-                temp1 = layers{r} .^2;
+                temp1 = layers{r+1} .^2;
                 
                 mean_A = mean(temp1');
                 mean_B = mean(layers{r+1}');
@@ -244,15 +244,16 @@ classdef Network_new_lateral < handle
                     
                 end
                 total_product = total_product./n;
-                temp = 0.001*(total_product -8*n*((mean_A')*(mean_B))');
-                weights{r} = (weights{r} - temp);
+                temp = 0.001*(total_product -*n*((mean_A')*(mean_B))');
+                weights{r} = (weights{r} - temp*0.5);
+%                 weights{r}(1 : layers{r+1} + 1 : layers{r+1} * layers{r+1}) = 1;
                 if any(temp <= 0)
                     this_check(r) = this_check(r) + 1;
                 end
             end
             
             obj.lateralConnections = weights;
-            obj.lrcheck = this_check;
+            obj.ltcheck = this_check;
             
         end
         
@@ -350,7 +351,10 @@ classdef Network_new_lateral < handle
                 
                 %
                 if k<obj.numLayers
+                   
                     layers{k + 1} = obj.feedforwardConnections{k}* layers{k};
+                    layers{k + 1} = obj.lateralConnections{k}* layers{k+1};
+                    
                 end
                 %
                 %                   layers{k + 1} = layers{k + 1}/norm(layers{k + 1},1.0);
@@ -379,11 +383,11 @@ end
             
             if(iteration>this_totalRounds)
                 
-                xlswrite('final_1_5.xlsx',layers{1});
-                xlswrite('final_2_5.xlsx',layers{2});
-                xlswrite('final_3_5.xlsx',layers{3});
-                xlswrite('final_4_9.xlsx',layers{4});
-                %
+%                 xlswrite('final_1_5.xlsx',layers{1});
+%                 xlswrite('final_2_5.xlsx',layers{2});
+%                 xlswrite('final_3_5.xlsx',layers{3});
+%                 xlswrite('final_4_9.xlsx',layers{4});
+%                 %
                 %
                 %
                 %

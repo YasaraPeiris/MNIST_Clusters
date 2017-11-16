@@ -227,7 +227,7 @@ classdef Network_new_lateral < handle
             %
             parfor r = 1 : obj.numLayers - 1
                 
-                temp1 = layers{r} .^2;
+                temp1 = layers{r+1};
                 
                 mean_A = mean(temp1');
                 mean_B = mean(layers{r+1}');
@@ -244,16 +244,16 @@ classdef Network_new_lateral < handle
                     
                 end
                 total_product = total_product./n;
-                temp = 0.001*(total_product -7*n*((mean_A')*(mean_B))');
-                weights{r} = (weights{r} - temp*0.5);
-                weights{r}(1 : layers{r+1} + 1 : layers{r+1} * layers{r+1}) = 1;
+                temp = 0.001*(total_product -5*n*((mean_A')*(mean_B))');
+                 weights{r} = (weights{r} - temp*0.0001);
+%                 weights{r}(1 : layers{r+1} + 1 : layers{r+1} * layers{r+1}) = 1;
                 if any(temp <= 0)
                     this_check(r) = this_check(r) + 1;
                 end
             end
             
             obj.lateralConnections = weights;
-            obj.lrcheck = this_check;
+            obj.ltcheck = this_check;
             
         end
         
