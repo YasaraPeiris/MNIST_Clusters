@@ -6,7 +6,7 @@ images = loadTrainImages();
 labels = loadTrainLabels();
 % images = convolution2dLayer(5,32);
 % size(images)
-selected = find(labels == 0  | labels == 1 );
+selected = find(labels == 5  | labels == 6 );
 labels = labels(selected);
 images = images(:, selected');
 [~, c] = size(images);
@@ -16,12 +16,12 @@ images = images(:, selected');
 % labels = labels(shuffle, :);
 % images = images(:, shuffle);
 
-selected_1 = find( labels == 0 );
+selected_1 = find( labels == 5 );
 labels_train_1 = labels(selected_1);
 images_train_1 = images(:, selected_1');
 
 
-selected_2 = find( labels == 1 );
+selected_2 = find( labels == 6 );
 labels_train_2 = labels(selected_2);
 images_train_2 = images(:, selected_2');
 

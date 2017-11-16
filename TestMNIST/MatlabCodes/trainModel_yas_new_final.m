@@ -5,16 +5,16 @@ p = 0;
 images = loadTrainImages();
 labels = loadTrainLabels();
 
-selected = find(labels == 8  | labels == 9 );
+selected = find(labels == 8  | labels == 6 );
 labels = labels(selected);
 images = images(:, selected');
 [~, c] = size(images);
 
-selected_1 = find( labels == 9 );
+selected_1 = find( labels == 8 );
 labels_train_1 = labels(selected_1);
 images_train_1 = images(:, selected_1');
 
-selected_2 = find( labels == 8 );
+selected_2 = find( labels == 6 );
 labels_train_2 = labels(selected_2);
 images_train_2 = images(:, selected_2');
 
@@ -55,7 +55,7 @@ end
 shuffle_t = randperm(d);
 test_label = test_label(shuffle_t, :);
 test_image = test_image(:, shuffle_t);
-
+xlswrite('test_label.xlsx',test_label);
 testLabels = [];
 clusters = [];
 
@@ -79,24 +79,48 @@ for j=1:trainingIterations
         
         
         for k=1:half_image_batch
+            
             image_id = half_image_batch*(r-1)+k;
             images_new_1 = [images_new_1 mat2gray(images_train_1(:, image_id))];
             images_new_2 = [images_new_2 mat2gray(images_train_2(:, image_id))];
+            
         end
+        
         images_new = [images_new images_new_1];
         images_new = [images_new images_new_2];
-        
    
         results = net.getOutput(images_new,r);
         
         time = tic;
         net.STDP_update(results,r);
         updateTime = updateTime + toc(time);
+        
         for u = 1 : image_batch
             
             norms = [norms; zeros(1, numLayers - 1)];
-            
             weights = net.feedforwardConnections;
+%             if r==1  
+%             for b = 1 : 50
+%                     
+%                 xlswrite('weights_1.xlsx',weights{1}(:,b));
+%                 xlswrite('weights_2.xlsx',weights{2}(:,b));
+%                 xlswrite('weights_3.xlsx',weights{3}(:,b));
+%                 
+%                
+%             end
+%             end
+%             
+%              if r==1  
+%             for b = 1 : 50
+%                     
+%                 xlswrite('weights_1_1ast.xlsx',weights{1}(:,b));
+%                 xlswrite('weights_2_1ast.xlsx',weights{2}(:,b));
+%                 xlswrite('weights_3_1ast.xlsx',weights{3}(:,b));
+%                 
+%                
+%             end
+%             end
+            
             for k = 1 : numLayers - 1
                 
                 norms(end, k) = norm(weights{k}(:,u) - tempW{k}(:,u),'fro') / numel(weights{k}(:,u));
