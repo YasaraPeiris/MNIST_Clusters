@@ -42,7 +42,7 @@ classdef Network_Laeral < handle
             
             obj.lateralConnections = cell([1, obj.numLayers - 1]);
             
-            for i = 1 : obj.numLayers - 1
+            for i = 3 : obj.numLayers - 1
                 
                 %obj.lateralConnections{i} = rand(layerStruct(i + 1),layerStruct(i + 1));
                 obj.lateralConnections{i} = - normr(binornd(1, 0.2, obj.layerStruct(i + 1), obj.layerStruct(i + 1)));
@@ -187,18 +187,18 @@ classdef Network_Laeral < handle
         end
         
         function STDP_update_lateral(obj, layers, iteration)
-            weights = obj.feedforwardConnections;
+            weights = obj.lateralConnections;
             this_check = obj.ltcheck;
             this_totalRounds = obj.iterationImages;
             %
-            parfor r = 1 : obj.numLayers - 1
+            parfor r = 3 : obj.numLayers - 1
                 
-                temp1 = layers{r} .^2;
+                temp1 = layers{r+1} .^2;
                 
                 mean_A = mean(temp1');
                 mean_B = mean(layers{r+1}');
                 
-                [m,n] = size(layers{r});
+                [m,n] = size(layers{r+1});
                 
                 [e,l] = size((mean_A')*(mean_B));
                 total_product = zeros(l,e);
@@ -210,15 +210,16 @@ classdef Network_Laeral < handle
                     
                 end
                 total_product = total_product./n;
-                temp = 0.001*(total_product -8*n*((mean_A')*(mean_B))');
-                weights{r} = (weights{r} - temp);
+                temp = 0.001*(total_product -((mean_A')*(mean_B))');
+                weights{r} = (weights{r} + temp*0.05);
+                temp
                 if any(temp <= 0)
                     this_check(r) = this_check(r) + 1;
                 end
             end
             
-            obj.feedforwardConnections = weights;
-            obj.ffcheck = this_check;
+            obj.lateralConnections = weights;
+            obj.ltcheck = this_check;
             
         end
         
@@ -264,7 +265,9 @@ classdef Network_Laeral < handle
             for k = 1 : obj.numLayers - 1
 
                 layers{k + 1} = obj.feedforwardConnections{k}* layers{k};
-                
+                if(k==obj.numLayers - 1)
+                layers{k + 1} = obj.lateralConnections{k}* layers{k+1};
+                end
                 layers{k + 1} = zscore(layers{k + 1},0);
                 if k<obj.numLayers-1
                     layers{k + 1} = tanh(layers{k + 1});
@@ -284,7 +287,7 @@ classdef Network_Laeral < handle
             
             obj.totalRounds = obj.totalRounds + 1;
             obj.STDP_update_feedforward(layers, r);
-            %          obj.STDP_update_lateral(layers);
+            obj.STDP_update_lateral(layers);
             
         end
         

@@ -55,7 +55,7 @@ norms = [];
 
 updateTime = 0.0;
 
-net = Network_new_label_3([784, layerset,3]);
+net = Network_new_lateral([784, layerset,3]);
 numLayers = net.numLayers;
 tempW = net.feedforwardConnections;
 %tempW = net.lateralConnections;

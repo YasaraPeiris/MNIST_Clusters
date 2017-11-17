@@ -47,7 +47,7 @@ classdef Network_new_lateral < handle
             
             obj.lateralConnections = cell([1, obj.numLayers - 1]);
             
-            for i = 1 : obj.numLayers - 1
+            for i = 3 : obj.numLayers - 1
                 
                 %obj.lateralConnections{i} = rand(layerStruct(i + 1),layerStruct(i + 1));
                 obj.lateralConnections{i} = - normr(binornd(1, 0.2, obj.layerStruct(i + 1), obj.layerStruct(i + 1)));
@@ -225,7 +225,7 @@ classdef Network_new_lateral < handle
             this_check = obj.ltcheck;
             this_totalRounds = obj.iterationImages;
             %
-            parfor r = 1 : obj.numLayers - 1
+            parfor r = 3 : obj.numLayers - 1
                 
                 temp1 = layers{r+1};
                 
@@ -244,8 +244,8 @@ classdef Network_new_lateral < handle
                     
                 end
                 total_product = total_product./n;
-                temp = 0.001*(total_product -5*n*((mean_A')*(mean_B))');
-                 weights{r} = (weights{r} - temp*0.0001);
+                temp = 0.001*(total_product -((mean_A')*(mean_B))');
+                weights{r} = (weights{r} - temp*0.5);
 %                 weights{r}(1 : layers{r+1} + 1 : layers{r+1} * layers{r+1}) = 1;
                 if any(temp <= 0)
                     this_check(r) = this_check(r) + 1;
@@ -350,12 +350,13 @@ classdef Network_new_lateral < handle
             for k = 1 : obj.numLayers - 1
                 
                 %
-                if k<obj.numLayers
+                
                    
                     layers{k + 1} = obj.feedforwardConnections{k}* layers{k};
+                    if k==obj.numLayers-1
                     layers{k + 1} = obj.lateralConnections{k}* layers{k+1};
                     
-                end
+                    end
                 %
                 %                   layers{k + 1} = layers{k + 1}/norm(layers{k + 1},1.0);
                 %                 if k~=obj.numLayers-1
